@@ -55,4 +55,8 @@ int  bank_load_matrix(const char *path, int matrix[][MAX_RESOURCES], int m,
                       char *err, size_t errlen);
 int  bank_validate(const bank_t *b, char *err, size_t errlen);
 
+/* Safety algorithm (Section 8.6.3.1) */
+int  bank_is_safe(const bank_t *b, int sequence[], int *seq_len,
+                  bank_trace_fn trace, void *ctx);
+
 #endif /* BANKER_H */

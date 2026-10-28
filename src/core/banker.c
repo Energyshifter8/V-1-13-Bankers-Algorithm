@@ -143,3 +143,60 @@ int bank_validate(const bank_t *b, char *err, size_t errlen)
             }
     return 0;
 }
+
+/* Return 1 when a[j] <= b[j] for every j < m. */
+static int vec_leq(const int a[], const int b[], int m)
+{
+    for (int j = 0; j < m; j++)
+        if (a[j] > b[j])
+            return 0;
+    return 1;
+}
+
+/*
+ * Safety algorithm (Section 8.6.3.1).
+ *
+ *  1. Work = Available, Finish[i] = false for all i.
+ *  2. Find an i such that Finish[i] == false and Need_i <= Work.
+ *     If no such i exists, go to step 4.
+ *  3. Work = Work + Allocation_i, Finish[i] = true. Go to step 2.
+ *  4. If Finish[i] == true for all i, the system is in a safe state.
+ *
+ * The customers are scanned in order 0..n-1 repeatedly until a full pass
+ * makes no progress. The order in which customers finish is stored in
+ * sequence[] (its length in *seq_len). Returns 1 if safe, 0 if unsafe.
+ * trace (may be NULL) is called for every examined customer.
+ */
+int bank_is_safe(const bank_t *b, int sequence[], int *seq_len,
+                 bank_trace_fn trace, void *ctx)
+{
+    int work[MAX_RESOURCES];
+    int finish[MAX_CUSTOMERS] = {0};
+    int done = 0, progress = 1;
+
+    memcpy(work, b->available, sizeof(work));
+
+    while (progress && done < b->n) {
+        progress = 0;
+        for (int i = 0; i < b->n; i++) {
+            if (finish[i])
+                continue;
+            int ok = vec_leq(b->need[i], work, b->m);
+            if (trace != NULL)
+                trace(b, i, ok, work, ctx);
+            if (!ok)
+                continue;
+            for (int j = 0; j < b->m; j++)
+                work[j] += b->allocation[i][j];
+            finish[i] = 1;
+            if (sequence != NULL)
+                sequence[done] = i;
+            done++;
+            progress = 1;
+        }
+    }
+
+    if (seq_len != NULL)
+        *seq_len = done;
+    return done == b->n;
+}
