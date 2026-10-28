@@ -200,3 +200,55 @@ int bank_is_safe(const bank_t *b, int sequence[], int *seq_len,
         *seq_len = done;
     return done == b->n;
 }
+
+static bank_status_t check_vector(const bank_t *b, int customer,
+                                  const int v[])
+{
+    if (customer < 0 || customer >= b->n)
+        return BANK_ERR_CUSTOMER;
+    for (int j = 0; j < b->m; j++)
+        if (v[j] < 0)
+            return BANK_ERR_NEGATIVE;
+    return BANK_OK;
+}
+
+/*
+ * Resource-request algorithm (Section 8.6.3.2) for customer i.
+ *
+ *  1. If Request_i <= Need_i go to step 2. Otherwise raise an error,
+ *     since the customer has exceeded its maximum claim.
+ *  2. If Request_i <= Available go to step 3. Otherwise the customer
+ *     must wait, since the resources are not available.
+ *  3. Pretend to allocate the resources:
+ *        Available    = Available - Request_i
+ *        Allocation_i = Allocation_i + Request_i
+ *        Need_i       = Need_i - Request_i
+ *     If the resulting state is safe the request is granted.
+ *     Otherwise the old state is restored and the customer must wait.
+ */
+bank_status_t bank_request(bank_t *b, int customer, const int request[])
+{
+    bank_status_t st = check_vector(b, customer, request);
+    if (st != BANK_OK)
+        return st;
+    if (!vec_leq(request, b->need[customer], b->m))
+        return BANK_ERR_EXCEEDS_NEED;
+    if (!vec_leq(request, b->available, b->m))
+        return BANK_ERR_UNAVAILABLE;
+
+    for (int j = 0; j < b->m; j++) {
+        b->available[j] -= request[j];
+        b->allocation[customer][j] += request[j];
+        b->need[customer][j] -= request[j];
+    }
+
+    if (bank_is_safe(b, NULL, NULL, NULL, NULL))
+        return BANK_OK;
+
+    for (int j = 0; j < b->m; j++) {
+        b->available[j] += request[j];
+        b->allocation[customer][j] -= request[j];
+        b->need[customer][j] += request[j];
+    }
+    return BANK_ERR_UNSAFE;
+}

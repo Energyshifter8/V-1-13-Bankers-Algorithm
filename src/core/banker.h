@@ -59,4 +59,7 @@ int  bank_validate(const bank_t *b, char *err, size_t errlen);
 int  bank_is_safe(const bank_t *b, int sequence[], int *seq_len,
                   bank_trace_fn trace, void *ctx);
 
+/* Resource-request algorithm (Section 8.6.3.2) */
+bank_status_t bank_request(bank_t *b, int customer, const int request[]);
+
 #endif /* BANKER_H */
