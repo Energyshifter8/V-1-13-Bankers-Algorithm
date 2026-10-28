@@ -7,8 +7,9 @@ CORE    := src/core
 
 all: $(BIN)/banker
 
-$(BIN)/banker: $(CORE)/main.c $(CORE)/banker.c $(CORE)/banker.h | $(BIN)
-	$(CC) $(CFLAGS) -o $@ $(CORE)/main.c $(CORE)/banker.c
+$(BIN)/banker: $(CORE)/main.c $(CORE)/banker.c $(CORE)/json.c $(CORE)/banker.h \
+               $(CORE)/json.h | $(BIN)
+	$(CC) $(CFLAGS) -o $@ $(CORE)/main.c $(CORE)/banker.c $(CORE)/json.c
 
 $(BIN)/unit_tests: tests/unit_tests.c $(CORE)/banker.c $(CORE)/banker.h | $(BIN)
 	$(CC) $(CFLAGS) -o $@ tests/unit_tests.c $(CORE)/banker.c
