@@ -339,6 +339,7 @@ function renderViewSwitch() {
   for (const b of sw.querySelectorAll("button")) {
     b.classList.toggle("active", b.dataset.view === ui.view);
   }
+  $("view-note").hidden = ui.view !== "trial";
 }
 
 // ------------------------------------------------------------------
@@ -457,6 +458,14 @@ function bindControls() {
   $("step-next").addEventListener("click", () => { stopPlaying(); goTo(ui.pos + 1); });
   $("step-last").addEventListener("click", () => { stopPlaying(); goTo(Infinity); });
   $("step-play").addEventListener("click", togglePlay);
+  document.addEventListener("keydown", (e) => {
+    if (!ui.resp || e.target.closest("input, select, textarea, button")) return;
+    if (e.key === "ArrowLeft") { stopPlaying(); goTo(ui.pos - 1); }
+    else if (e.key === "ArrowRight") { stopPlaying(); goTo(ui.pos + 1); }
+    else if (e.key === " ") togglePlay();
+    else return;
+    e.preventDefault();
+  });
   $("step-speed").addEventListener("change", () => {
     if (ui.timer) { stopPlaying(); togglePlay(); }
   });

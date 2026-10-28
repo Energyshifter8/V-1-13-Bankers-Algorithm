@@ -87,6 +87,8 @@
           <button data-view="current" class="active">Одоогийн төлөв</button>
           <button data-view="trial">Татгалзсан хүсэлтийн туршилтын төлөв</button>
         </div>
+        <p id="view-note" class="hint" hidden>Энэ нь C программ хүсэлтийг түр олгож (pretend) safety algorithm-аар шалгасан төлөв.
+          Хүсэлт татгалзагдсан тул бодит төлөв өөрчлөгдөөгүй.</p>
         <div id="graph" class="graph"></div>
         <div id="legend" class="legend"></div>
       </div>
@@ -105,9 +107,10 @@
             </label>
           </div>
         </div>
-        <div id="step-info" class="step-info"></div>
+        <div id="step-info" class="step-info" aria-live="polite"></div>
         <div id="work-finish" class="work-finish"></div>
         <div id="sequence" class="sequence"></div>
+        <p class="hint">Гарын товч: ← өмнөх, → дараах, Space тоглуулах/зогсоох (оролтын талбар идэвхгүй үед).</p>
       </div>
 
       <div class="card">
