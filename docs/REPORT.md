@@ -5,13 +5,13 @@
 <div class="course">F.CSM302 Үйлдлийн систем</div>
 <div class="term">2026-2027 оны хичээлийн жилийн намар</div>
 <div class="topic"><b>Сэдэв:</b> V-1-13 Banker's Algorithm (Deadlocks)</div>
-<div class="prepared">Бэлтгэсэн: /................................../ /B241910044/</div>
-<div class="members">Багийн гишүүд:<br>/B241910014/<br>/B232270148/<br>/B222270050/<br>/B242270026/</div>
+<div class="prepared">Бэлтгэсэн: /................................../ /B241910044/ Б.Тэмүүлэн</div>
+<div class="members">Багийн гишүүд:<br>/B241910014/ Б.Намуунаа<br>/B232270148/ А.Бат-Эрдэнэ<br>/B222270050/ Ё.Болормаа<br>/B242270026/ Н.Лууболд</div>
 <div class="checked">Шалгасан: /....................................../ Г. Ганбат /F.CS10/</div>
 <div class="city">Улаанбаатар хот<br>2026 он</div>
 </div>
 <div class="doc-title">F.CSM302 Үйлдлийн систем: Бие даалт 1. Тайлан</div>
-<p class="meta"><b>Хуваарилалтын код:</b> V-1-13 <b>Төсөл:</b> Banker's Algorithm (Operating System Concepts 2018, Бүлэг 8, Deadlocks) <b>UI дүрслэл:</b> Resource graph <b>Гишүүд:</b> B241910044; B241910014; B232270148; B222270050; B242270026<br><b>GitHub:</b> https://github.com/Energyshifter8/V-1-13-Bankers-Algorithm (tag v1.0)</p>
+<p class="meta"><b>Хуваарилалтын код:</b> V-1-13 <b>Төсөл:</b> Banker's Algorithm (Operating System Concepts 2018, Бүлэг 8, Deadlocks) <b>UI дүрслэл:</b> Resource graph <b>Гишүүд:</b> B241910044 Б.Тэмүүлэн; B241910014 Б.Намуунаа; B232270148 А.Бат-Эрдэнэ; B222270050 Ё.Болормаа; B242270026 Н.Лууболд<br><b>GitHub:</b> https://github.com/Energyshifter8/V-1-13-Bankers-Algorithm</p>
 
 # Хураангуй
 
@@ -440,7 +440,6 @@ thread-уудыг индексийн дарааллаар давтан шалг�
 
 Төслийг эхнээс нь GitHub дээр public repository болгон байршуулж, ажлын алхам бүрийг тусад
 нь commit хийсэн. Repository: `github.com/Energyshifter8/V-1-13-Bankers-Algorithm`.
-БД1-д нийтэлсэн хувилбар нь `v1.0` tag.
 
 | Үе шат | Commit-ийн жишээ |
 |---|---|

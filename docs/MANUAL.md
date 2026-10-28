@@ -5,8 +5,8 @@
 <div class="course">F.CSM302 Үйлдлийн систем</div>
 <div class="term">2026-2027 оны хичээлийн жилийн намар</div>
 <div class="topic"><b>Сэдэв:</b> V-1-13 Banker's Algorithm (Deadlocks)</div>
-<div class="prepared">Бэлтгэсэн: /................................../ /B241910044/</div>
-<div class="members">Багийн гишүүд:<br>/B241910014/<br>/B232270148/<br>/B222270050/<br>/B242270026/</div>
+<div class="prepared">Бэлтгэсэн: /................................../ /B241910044/ Б.Тэмүүлэн</div>
+<div class="members">Багийн гишүүд:<br>/B241910014/ Б.Намуунаа<br>/B232270148/ А.Бат-Эрдэнэ<br>/B222270050/ Ё.Болормаа<br>/B242270026/ Н.Лууболд</div>
 <div class="checked">Шалгасан: /....................................../ Г. Ганбат /F.CS10/</div>
 <div class="city">Улаанбаатар хот<br>2026 он</div>
 </div>
@@ -191,7 +191,6 @@ Available-ийг `10 6 7 8` болгоход (`examples/04_book_project_6B.txt`)
 ```
 git clone https://github.com/Energyshifter8/V-1-13-Bankers-Algorithm.git
 cd V-1-13-Bankers-Algorithm
-git checkout v1.0        # БД1-д нийтэлсэн хувилбар
 ```
 
 ## 2.2 OS, compiler/runtime, version
