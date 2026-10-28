@@ -18,6 +18,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -114,9 +115,8 @@ input.invalid { border-color: var(--bad); background: var(--bad-soft); }
 .matrix-editor th.group { color: var(--text); border-bottom: 1px solid var(--border); }
 .matrix-editor td { padding: 2px; text-align: center; }
 .matrix-editor td.sep, .matrix-editor th.sep { width: 10px; }
-.matrix-editor input { width: 42px; padding: 3px 4px; text-align: right; font-family: var(--mono); }
+.matrix-editor input { width: 38px; padding: 3px 4px; text-align: right; font-family: var(--mono); }
 .matrix-editor input.dirty { background: var(--warn-soft); border-color: var(--warn); }
-.matrix-editor .need { font-family: var(--mono); color: var(--muted); min-width: 28px; display: inline-block; }
 .matrix-editor .rowname { font-weight: 600; padding-right: 6px; }
 
 .vector-inputs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
