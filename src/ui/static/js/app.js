@@ -3,6 +3,7 @@
 // comes from the JSON answer of the C program (see api.js).
 
 import { api } from "./api.js";
+import { renderGraph, renderLegend } from "./graph.js";
 
 const $ = (id) => document.getElementById(id);
 const letter = (j) => String.fromCharCode(65 + j);
@@ -38,6 +39,33 @@ function renderBadge() {
   const safe = ui.resp.safety.safe;
   badge.textContent = safe ? "SAFE" : "UNSAFE";
   badge.className = "badge " + (safe ? "safe" : "unsafe");
+}
+
+// The last RQ command of the C program, drawn as request edges.
+function lastRequest() {
+  const r = ui.resp;
+  if (r.customer === undefined || !/^\s*rq\b/i.test(r.command || "")) return null;
+  return { customer: r.customer, vector: r.vector };
+}
+
+function renderGraphView() {
+  const s = ui.resp.state;
+  const safety = ui.resp.safety;
+  const order = Array(s.n).fill(null);
+  safety.sequence.forEach((c, k) => (order[c] = k));
+  const status = order.map((o) => (o === null ? "blocked" : "finished"));
+  renderGraph($("graph"), {
+    state: s,
+    status,
+    order,
+    work: null,
+    request: lastRequest(),
+    show: {
+      alloc: $("show-alloc").checked,
+      need: $("show-need").checked,
+      labels: $("show-labels").checked,
+    },
+  });
 }
 
 function renderStateTable() {
@@ -199,6 +227,7 @@ function update(resp) {
 
 function render() {
   renderBadge();
+  renderGraphView();
   renderStateTable();
   renderEditor();
 }
@@ -227,6 +256,10 @@ async function guard(fn) {
 }
 
 function bindControls() {
+  for (const id of ["show-alloc", "show-need", "show-labels"]) {
+    $(id).addEventListener("change", () => ui.resp && renderGraphView());
+  }
+
   $("btn-apply").addEventListener("click", () =>
     guard(async () => {
       const cmds = editorCommands();
@@ -284,6 +317,7 @@ function bindControls() {
 
 async function init() {
   bindControls();
+  renderLegend($("legend"));
   await guard(async () => {
     ui.examples = await api.examples();
     const select = $("example-select");
