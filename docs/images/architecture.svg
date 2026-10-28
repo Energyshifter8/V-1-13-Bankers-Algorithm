@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="360" viewBox="0 0 860 360" font-family="Noto Sans, DejaVu Sans, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b5469"/>
+    </marker>
+    <style>
+      .box { fill: #fff; stroke: #4b5469; stroke-width: 1.6; rx: 8; }
+      .core { fill: #e7eeff; stroke: #2f5bd3; }
+      .ui { fill: #e3f6eb; stroke: #1f9d55; }
+      .data { fill: #fff5d6; stroke: #c98a00; }
+      .t { font-weight: 700; font-size: 14px; }
+      .s { fill: #555; font-size: 12px; }
+      .l { fill: #2f5bd3; font-size: 12px; font-weight: 700; }
+      .line { stroke: #4b5469; stroke-width: 1.6; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Browser -->
+  <rect class="box ui" x="20" y="30" width="230" height="130"/>
+  <text class="t" x="35" y="55">Web UI (браузер)</text>
+  <text class="s" x="35" y="78">index.html, style.css</text>
+  <text class="s" x="35" y="96">app.js – самбарууд, засварлагч</text>
+  <text class="s" x="35" y="114">graph.js – Resource graph (SVG)</text>
+  <text class="s" x="35" y="132">stepper.js – safety алхамчлал</text>
+  <text class="s" x="35" y="150">api.js – HTTP/JSON</text>
+
+  <!-- Server -->
+  <rect class="box" x="315" y="30" width="230" height="130"/>
+  <text class="t" x="330" y="55">src/ui/server.py</text>
+  <text class="s" x="330" y="78">Python 3 стандарт сан</text>
+  <text class="s" x="330" y="96">GET /api/state, /api/examples</text>
+  <text class="s" x="330" y="114">POST /api/command, /api/batch</text>
+  <text class="s" x="330" y="132">POST /api/restart</text>
+  <text class="s" x="330" y="150">нэг C процессыг удирдана</text>
+
+  <!-- C program JSON mode -->
+  <rect class="box core" x="610" y="30" width="230" height="130"/>
+  <text class="t" x="625" y="55">bin/banker -j (C)</text>
+  <text class="s" x="625" y="78">main.c – командын parser</text>
+  <text class="s" x="625" y="96">json.c – state, safety trace</text>
+  <text class="s" x="625" y="114">1 мөр команд → 1 мөр JSON</text>
+  <text class="s" x="625" y="132">outcome, reason, state,</text>
+  <text class="s" x="625" y="150">safety, trial, warnings</text>
+
+  <!-- arrows top row -->
+  <path class="line" d="M250,80 L313,80" marker-end="url(#a)"/>
+  <path class="line" d="M313,110 L252,110" marker-end="url(#a)"/>
+  <text class="l" x="257" y="73">HTTP</text>
+  <text class="l" x="257" y="127">JSON</text>
+  <path class="line" d="M545,80 L608,80" marker-end="url(#a)"/>
+  <path class="line" d="M608,110 L547,110" marker-end="url(#a)"/>
+  <text class="l" x="553" y="73">stdin</text>
+  <text class="l" x="553" y="127">stdout</text>
+
+  <!-- Core library -->
+  <rect class="box core" x="560" y="215" width="280" height="120"/>
+  <text class="t" x="575" y="240">src/core/banker.c / banker.h</text>
+  <text class="s" x="575" y="262">available, maximum, allocation, need</text>
+  <text class="s" x="575" y="280">bank_is_safe() – Safety (§8.6.3.1)</text>
+  <text class="s" x="575" y="298">bank_request() – Request (§8.6.3.2)</text>
+  <text class="s" x="575" y="316">bank_release(), bank_load_matrix()</text>
+  <path class="line" d="M725,160 L725,213" marker-end="url(#a)"/>
+
+  <!-- CLI -->
+  <rect class="box" x="315" y="215" width="200" height="120"/>
+  <text class="t" x="330" y="240">bin/banker (CLI)</text>
+  <text class="s" x="330" y="262">banker -f max.txt 10 5 7 8</text>
+  <text class="s" x="330" y="280">RQ, RL, * (номын командууд)</text>
+  <text class="s" x="330" y="298">SAFE, RESET, NEW, AVAIL,</text>
+  <text class="s" x="330" y="316">MAX, ALLOC, SAVE, HELP</text>
+  <path class="line" d="M515,275 L558,275" marker-end="url(#a)"/>
+
+  <!-- data -->
+  <rect class="box data" x="20" y="215" width="230" height="120"/>
+  <text class="t" x="35" y="240">Өгөгдөл ба тест</text>
+  <text class="s" x="35" y="262">tests/data/*.txt – Max/Allocation</text>
+  <text class="s" x="35" y="280">examples/*.txt – UI сценари</text>
+  <text class="s" x="35" y="298">tests/cases → tests/expected</text>
+  <text class="s" x="35" y="316">tests/unit_tests.c, test_ui_server.py</text>
+  <path class="line" d="M250,275 L313,275" marker-end="url(#a)"/>
+  <path class="line" d="M190,213 L370,163" marker-end="url(#a)"/>
+</svg>
