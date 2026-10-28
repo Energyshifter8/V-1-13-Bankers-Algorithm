@@ -2,10 +2,13 @@
  * main.c - interactive driver for the banker's algorithm
  * (OSC 10th ed., Chapter 8 Programming Project).
  *
- * Usage:  banker [-f maximum_file] r1 r2 ... rm
+ * Usage:  banker [-f maximum_file] [-a allocation_file] r1 r2 ... rm
  *
  * r1..rm are the available instances of each resource type. The maximum
- * file holds one line per customer, e.g. "6,4,7,3".
+ * file holds one line per customer, e.g. "6,4,7,3". The optional
+ * allocation file (same format) sets the resources already held by each
+ * customer, so a snapshot such as the example of Section 8.6.3.3 can be
+ * loaded directly.
  *
  * Commands:
  *   RQ c r1 .. rm   customer c requests resources
@@ -319,10 +322,12 @@ static int run_command(char *line)
 static void usage(const char *prog)
 {
     fprintf(stderr,
-            "Usage: %s [-f maximum_file] r1 r2 ... rm\n"
+            "Usage: %s [-f maximum_file] [-a allocation_file] r1 r2 ... rm\n"
             "  r1..rm           available instances of each resource type\n"
             "  -f maximum_file  maximum demand of each customer, one line\n"
             "                   per customer (default: %s)\n"
+            "  -a alloc_file    resources already allocated to each customer\n"
+            "                   (optional, default: all zero)\n"
             "Example: %s -f maximum.txt 10 5 7 8\n",
             prog, DEFAULT_MAX_FILE, prog);
 }
@@ -330,6 +335,7 @@ static void usage(const char *prog)
 int main(int argc, char *argv[])
 {
     const char *max_file = DEFAULT_MAX_FILE;
+    const char *alloc_file = NULL;
     int resources[MAX_RESOURCES];
     int m = 0;
     char err[512];
@@ -345,6 +351,12 @@ int main(int argc, char *argv[])
                 return 1;
             }
             max_file = argv[k];
+        } else if (strcmp(a, "-a") == 0) {
+            if (++k == argc) {
+                fprintf(stderr, "error: -a needs a file name\n");
+                return 1;
+            }
+            alloc_file = argv[k];
         } else {
             char *end;
             errno = 0;
@@ -383,6 +395,24 @@ int main(int argc, char *argv[])
     }
     bank.n = n;
     memcpy(bank.available, resources, sizeof(int) * m);
+
+    if (alloc_file != NULL) {
+        int rows = bank_load_matrix(alloc_file, bank.allocation, m, err,
+                                    sizeof(err));
+        if (rows < 0) {
+            fprintf(stderr, "error: %s\n", err);
+            return 1;
+        }
+        if (rows != n) {
+            fprintf(stderr, "error: %s has %d customers but %s has %d\n",
+                    alloc_file, rows, max_file, n);
+            return 1;
+        }
+        if (bank_validate(&bank, err, sizeof(err)) < 0) {
+            fprintf(stderr, "error: %s\n", err);
+            return 1;
+        }
+    }
     bank_update_need(&bank);
     initial = bank;
 
