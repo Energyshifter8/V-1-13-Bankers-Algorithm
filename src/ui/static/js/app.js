@@ -18,6 +18,8 @@ const ui = {
   pos: 0,          // position in the safety trace (see stepper.js)
   timer: null,
   view: "current", // "current" or "trial" (pretend state of a denied request)
+  typed: [],       // commands typed in the console (for arrow up/down)
+  typedPos: 0,
 };
 
 // State and safety trace shown by the graph and the stepper.
@@ -371,14 +373,27 @@ function render() {
   renderEditor();
 }
 
+// History of every command sent to the C program and its answer.
+function log(resp) {
+  const list = $("history");
+  const item = el("li", {},
+    el("span", { class: "cmd" }, resp.command || "(start)"),
+    el("span", { class: "tag " + resp.outcome }, resp.outcome + (resp.reason ? ": " + resp.reason : "")));
+  if (resp.message.trim()) item.append(el("div", { class: "out" }, resp.message.trimEnd()));
+  list.prepend(item);
+  while (list.children.length > 200) list.lastChild.remove();
+}
+
 async function run(command) {
   const resp = await api.command(command);
+  log(resp);
   update(resp);
   return resp;
 }
 
 async function runBatch(commands) {
   const results = await api.batch(commands);
+  results.forEach(log);
   const failed = results.find((r) => r.outcome === "error");
   if (results.length) update(results[results.length - 1]);
   return failed;
@@ -394,7 +409,28 @@ async function guard(fn) {
   }
 }
 
+function bindConsole() {
+  const input = $("console-input");
+  $("console-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const command = input.value.trim();
+    if (!command) return;
+    ui.typed.push(command);
+    ui.typedPos = ui.typed.length;
+    input.value = "";
+    guard(async () => explain(await run(command)));
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    e.preventDefault();
+    ui.typedPos += e.key === "ArrowUp" ? -1 : 1;
+    ui.typedPos = Math.max(0, Math.min(ui.typedPos, ui.typed.length));
+    input.value = ui.typed[ui.typedPos] ?? "";
+  });
+}
+
 function bindControls() {
+  bindConsole();
   $("btn-request").addEventListener("click", () =>
     guard(async () => explain(await run(requestCommand("RQ")))));
   $("btn-release").addEventListener("click", () =>
@@ -488,7 +524,9 @@ async function init() {
     const select = $("example-select");
     for (const ex of ui.examples) select.append(el("option", {}, ex.title));
     select.dispatchEvent(new Event("change"));
-    update(await api.state());
+    const resp = await api.state();
+    log(resp);
+    update(resp);
   });
 }
 
