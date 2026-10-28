@@ -1,0 +1,10 @@
+# Own test: 8 customers, 5 resource types, whitespace separated values
+# Run with: ./bin/banker -f tests/data/large_max.txt 20 15 12 10 8
+5 3 2 1 4
+2 7 1 3 0
+8 2 4 2 1
+1 1 6 0 2
+3 4 3 5 3
+6 0 2 2 2
+0 5 5 4 1
+4 2 1 3 6

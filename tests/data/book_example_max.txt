@@ -1,0 +1,7 @@
+# Section 8.6.3.3 example: 5 threads T0..T4, resource types A B C
+# Run with: ./bin/banker -f tests/data/book_example_max.txt -a tests/data/book_example_alloc.txt 3 3 2
+7,5,3
+3,2,2
+9,0,2
+2,2,2
+4,3,3

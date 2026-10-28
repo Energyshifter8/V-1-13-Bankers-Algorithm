@@ -1,0 +1,5 @@
+# Own test: a snapshot that is already UNSAFE (no customer can finish)
+# Run with: ./bin/banker -f tests/data/unsafe_max.txt -a tests/data/unsafe_alloc.txt 1 1
+4,4
+4,4
+4,4
