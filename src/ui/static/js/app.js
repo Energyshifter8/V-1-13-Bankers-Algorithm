@@ -346,8 +346,11 @@ function renderViewSwitch() {
 // Commands
 // ------------------------------------------------------------------
 
+// Panel that shows the result of the action being run (see guard()).
+let resultBox = "result";
+
 function showResult(kind, title, detail) {
-  const box = $("result");
+  const box = $(resultBox);
   box.hidden = false;
   box.className = "result " + kind;
   box.replaceChildren(el("div", {}, title));
@@ -400,7 +403,8 @@ async function runBatch(commands) {
   return failed;
 }
 
-async function guard(fn) {
+async function guard(fn, box = "result") {
+  resultBox = box;
   try {
     await fn();
     $("conn").classList.remove("down");
@@ -480,7 +484,7 @@ function bindControls() {
       const failed = await runBatch([...cmds, "SAVE"]);
       if (failed) showResult("bad", "C программ засварыг хүлээж аваагүй:", failed.message);
       else showResult("ok", `${cmds.length} команд амжилттай (SAVE хийгдсэн).`, cmds.join("\n"));
-    })
+    }, "editor-result")
   );
 
   $("btn-discard").addEventListener("click", () => {
@@ -492,21 +496,21 @@ function bindControls() {
     guard(async () => {
       const resp = await run(`NEW ${$("size-n").value} ${$("size-m").value}`);
       showResult(resp.outcome === "error" ? "bad" : "ok", resp.message.trim());
-    })
+    }, "editor-result")
   );
 
   $("btn-reset").addEventListener("click", () =>
     guard(async () => {
       const resp = await run("RESET");
       showResult("ok", resp.message.trim());
-    })
+    }, "scenario-result")
   );
 
   $("btn-restart").addEventListener("click", () =>
     guard(async () => {
       update(await api.restart());
       showResult("ok", "C процесс дахин эхэллээ (§8.6.3.3 жишээ).");
-    })
+    }, "scenario-result")
   );
 
   $("example-select").addEventListener("change", () => {
@@ -521,7 +525,7 @@ function bindControls() {
       const failed = await runBatch(ex.commands);
       if (failed) showResult("bad", "Сценари ачаалахад алдаа гарлаа:", failed.message);
       else showResult("ok", `"${ex.title}" ачааллаа.`);
-    })
+    }, "scenario-result")
   );
 }
 
