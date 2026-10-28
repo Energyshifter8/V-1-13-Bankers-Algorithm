@@ -1,0 +1,21 @@
+# title: Larger system (8 threads, 5 resource types)
+# description: Own test with 8 customers and 5 resource types, partly allocated. Safe, but T1 and T4 can only finish in the second pass.
+NEW 8 5
+AVAIL 3 2 4 1 2
+MAX 0 5 3 2 1 4
+MAX 1 2 7 1 3 0
+MAX 2 8 2 4 2 1
+MAX 3 1 1 6 0 2
+MAX 4 3 4 3 5 3
+MAX 5 6 0 2 2 2
+MAX 6 0 5 5 4 1
+MAX 7 4 2 1 3 6
+ALLOC 0 2 1 1 0 2
+ALLOC 1 1 3 0 1 0
+ALLOC 2 3 0 2 1 0
+ALLOC 3 0 1 2 0 1
+ALLOC 4 1 2 0 2 1
+ALLOC 5 3 0 1 1 0
+ALLOC 6 0 2 1 1 1
+ALLOC 7 2 0 0 1 2
+SAVE

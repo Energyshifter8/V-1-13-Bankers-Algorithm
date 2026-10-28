@@ -1,0 +1,15 @@
+# title: Textbook 8.6.3.3 (5 threads, A B C)
+# description: Snapshot at time T0 from Section 8.6.3.3. Safe; try RQ 1 1 0 2, then RQ 4 3 3 0 and RQ 0 0 2 0.
+NEW 5 3
+AVAIL 3 3 2
+MAX 0 7 5 3
+MAX 1 3 2 2
+MAX 2 9 0 2
+MAX 3 2 2 2
+MAX 4 4 3 3
+ALLOC 0 0 1 0
+ALLOC 1 2 0 0
+ALLOC 2 3 0 2
+ALLOC 3 2 1 1
+ALLOC 4 0 0 2
+SAVE

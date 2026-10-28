@@ -1,0 +1,11 @@
+# title: Unsafe snapshot (3 threads, A B)
+# description: Nobody can finish with Available (1, 1). Releasing T0's resources (RL 0 2 1) makes the state safe again.
+NEW 3 2
+AVAIL 1 1
+MAX 0 4 4
+MAX 1 4 4
+MAX 2 4 4
+ALLOC 0 2 1
+ALLOC 1 1 2
+ALLOC 2 1 1
+SAVE

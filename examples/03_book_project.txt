@@ -1,0 +1,10 @@
+# title: Programming project input (10 5 7 8)
+# description: The maximum file of the project description. T4 claims 6 B but only 5 exist, so the state is unsafe and every request is denied.
+NEW 5 4
+AVAIL 10 5 7 8
+MAX 0 6 4 7 3
+MAX 1 4 2 3 2
+MAX 2 2 5 3 3
+MAX 3 6 3 3 2
+MAX 4 5 6 7 5
+SAVE

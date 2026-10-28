@@ -1,0 +1,10 @@
+# title: Programming project input (10 6 7 8)
+# description: Same maximum demand but with 6 instances of B, so every customer can finish. Try RQ 0 3 1 2 1.
+NEW 5 4
+AVAIL 10 6 7 8
+MAX 0 6 4 7 3
+MAX 1 4 2 3 2
+MAX 2 2 5 3 3
+MAX 3 6 3 3 2
+MAX 4 5 6 7 5
+SAVE
