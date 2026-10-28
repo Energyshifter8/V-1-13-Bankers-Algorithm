@@ -17,7 +17,13 @@ const ui = {
   examples: [],
   pos: 0,          // position in the safety trace (see stepper.js)
   timer: null,
+  view: "current", // "current" or "trial" (pretend state of a denied request)
 };
+
+// State and safety trace shown by the graph and the stepper.
+function src() {
+  return ui.view === "trial" && ui.resp.trial ? ui.resp.trial : ui.resp;
+}
 
 // ------------------------------------------------------------------
 // Rendering
@@ -52,8 +58,8 @@ function lastRequest() {
 }
 
 function renderGraphView() {
-  const s = ui.resp.state;
-  const f = frame(s, ui.resp.safety, ui.pos);
+  const s = src().state;
+  const f = frame(s, src().safety, ui.pos);
   renderGraph($("graph"), {
     state: s,
     status: f.status,
@@ -69,8 +75,8 @@ function renderGraphView() {
 }
 
 function renderStepper() {
-  const s = ui.resp.state;
-  const safety = ui.resp.safety;
+  const s = src().state;
+  const safety = src().safety;
   const f = frame(s, safety, ui.pos);
   $("step-info").innerHTML = f.html;
 
@@ -96,7 +102,7 @@ function renderStepper() {
 }
 
 function goTo(pos) {
-  ui.pos = Math.max(0, Math.min(pos, lastPosition(ui.resp.safety)));
+  ui.pos = Math.max(0, Math.min(pos, lastPosition(src().safety)));
   renderGraphView();
   renderStepper();
 }
@@ -110,9 +116,9 @@ function togglePlay() {
   if (ui.timer) {
     stopPlaying();
   } else {
-    if (ui.pos >= lastPosition(ui.resp.safety)) ui.pos = 0;
+    if (ui.pos >= lastPosition(src().safety)) ui.pos = 0;
     ui.timer = setInterval(() => {
-      if (ui.pos >= lastPosition(ui.resp.safety)) stopPlaying();
+      if (ui.pos >= lastPosition(src().safety)) stopPlaying();
       else goTo(ui.pos + 1);
       renderStepper();
     }, Number($("step-speed").value));
@@ -259,6 +265,81 @@ function editorCommands() {
 }
 
 // ------------------------------------------------------------------
+// Request / Release
+// ------------------------------------------------------------------
+
+function renderRequestPanel() {
+  const s = ui.resp.state;
+  const select = $("req-customer");
+  const keep = Math.min(Number(select.value) || 0, s.n - 1);
+  select.replaceChildren(...Array.from({ length: s.n }, (_, i) => el("option", { value: i }, "T" + i)));
+  select.value = keep;
+
+  const box = $("req-vector");
+  const old = [...box.querySelectorAll("input")].map((x) => x.value);
+  box.replaceChildren();
+  for (let j = 0; j < s.m; j++) {
+    box.append(el("label", {}, letter(j),
+      el("input", { type: "text", inputmode: "numeric", value: old[j] ?? "0", "aria-label": letter(j) })));
+  }
+  box.append(el("p", { class: "hint", id: "req-hint", style: "width:100%" }));
+  updateRequestHint();
+}
+
+function updateRequestHint() {
+  const s = ui.resp.state;
+  const i = Number($("req-customer").value);
+  $("req-hint").textContent =
+    `T${i}: Need ${vec(s.need[i])}, Allocation ${vec(s.allocation[i])}, Available ${vec(s.available)}`;
+}
+
+function requestCommand(kind) {
+  const inputs = [...$("req-vector").querySelectorAll("input")];
+  let empty = false;
+  for (const input of inputs) {
+    const bad = input.value.trim() === "";
+    input.classList.toggle("invalid", bad);
+    empty ||= bad;
+  }
+  if (empty) throw new Error("Нөөц бүрт тоо оруулна уу (0 байж болно).");
+  return `${kind} ${$("req-customer").value} ` + inputs.map((x) => x.value.trim()).join(" ");
+}
+
+const REASONS = {
+  exceeds_need: ["bad", "✖ Татгалзсан: хүсэлт нь Need-ээс их буюу maximum claim-аа хэтрүүлсэн (алдаа)."],
+  unavailable: ["warn", "⏳ Хүлээнэ: Available нөөц хүрэлцэхгүй. Thread бусад нь нөөцөө чөлөөлөхийг хүлээнэ."],
+  unsafe: ["bad", "✖ Татгалзсан: олгосон тохиолдолд систем UNSAFE төлөвт орно. " +
+    "\"Туршилтын төлөв\" товчоор шалтгааныг алхамчилж харна уу."],
+  exceeds_allocation: ["bad", "✖ Татгалзсан: эзэмшиж буй нөөцөөсөө их чөлөөлөх боломжгүй."],
+};
+
+function explain(resp) {
+  const msg = resp.message.trim();
+  if (resp.outcome === "granted") {
+    showResult("ok", "✔ Зөвшөөрөгдлөө: систем safe төлөвт үлдэнэ. Safe sequence: <" +
+      resp.safety.sequence.map((c) => "T" + c).join(", ") + ">", msg);
+  } else if (resp.outcome === "released") {
+    showResult("ok", "✔ Нөөц чөлөөлөгдөж Available нэмэгдлээ.", msg);
+  } else if (resp.outcome === "denied") {
+    const [kind, text] = REASONS[resp.reason] || ["bad", "✖ Татгалзсан."];
+    showResult(kind, text, msg);
+  } else if (resp.outcome === "error") {
+    showResult("bad", "C программ алдаа мэдээллээ:", msg);
+  } else {
+    showResult("", "C программын гаралт:", msg || "(хоосон)");
+  }
+}
+
+function renderViewSwitch() {
+  const sw = $("view-switch");
+  sw.hidden = !ui.resp.trial;
+  if (!ui.resp.trial) ui.view = "current";
+  for (const b of sw.querySelectorAll("button")) {
+    b.classList.toggle("active", b.dataset.view === ui.view);
+  }
+}
+
+// ------------------------------------------------------------------
 // Commands
 // ------------------------------------------------------------------
 
@@ -275,14 +356,17 @@ function update(resp) {
   ui.resp = resp;
   ui.draft = draftFromState(resp.state);
   stopPlaying();
+  ui.view = "current";
   ui.pos = lastPosition(resp.safety);
   render();
 }
 
 function render() {
   renderBadge();
+  renderViewSwitch();
   renderGraphView();
   renderStepper();
+  renderRequestPanel();
   renderStateTable();
   renderEditor();
 }
@@ -311,6 +395,23 @@ async function guard(fn) {
 }
 
 function bindControls() {
+  $("btn-request").addEventListener("click", () =>
+    guard(async () => explain(await run(requestCommand("RQ")))));
+  $("btn-release").addEventListener("click", () =>
+    guard(async () => explain(await run(requestCommand("RL")))));
+  $("req-customer").addEventListener("change", updateRequestHint);
+
+  for (const b of $("view-switch").querySelectorAll("button")) {
+    b.addEventListener("click", () => {
+      stopPlaying();
+      ui.view = b.dataset.view;
+      ui.pos = lastPosition(src().safety);
+      renderViewSwitch();
+      renderGraphView();
+      renderStepper();
+    });
+  }
+
   for (const id of ["show-alloc", "show-need", "show-labels"]) {
     $(id).addEventListener("change", () => ui.resp && renderGraphView());
   }
