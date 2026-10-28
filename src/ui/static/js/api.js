@@ -24,6 +24,7 @@ export const api = {
   state: () => call("GET", "/api/state"),
   examples: () => call("GET", "/api/examples"),
   command: (command) => call("POST", "/api/command", { command }),
-  batch: (commands) => call("POST", "/api/batch", { commands }),
+  // stops at the first command the C program reports as an error
+  batch: (commands) => call("POST", "/api/batch", { commands, stop_on_error: true }),
   restart: () => call("POST", "/api/restart"),
 };

@@ -156,7 +156,12 @@ class Handler(SimpleHTTPRequestHandler):
                 commands = body.get("commands", [])
                 if not isinstance(commands, list) or len(commands) > 2000:
                     raise ValueError("commands must be a list")
-                results = [self.banker.send(str(c)) for c in commands]
+                results = []
+                for command in commands:
+                    results.append(self.banker.send(str(command)))
+                    if (body.get("stop_on_error")
+                            and results[-1]["outcome"] == "error"):
+                        break
                 self.send_json(results)
             elif self.path == "/api/restart":
                 self.send_json(self.banker.restart())
