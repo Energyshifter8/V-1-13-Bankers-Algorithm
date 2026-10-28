@@ -8,7 +8,15 @@
 | Төсөл | Banker's Algorithm (Programming Project, Бүлэг 8 – Deadlocks) |
 | Сурах бичиг | A. Silberschatz, P. B. Galvin, G. Gagne, *Operating System Concepts*, 10th ed., Wiley, 2018 |
 | UI дүрслэл | Resource graph |
-| Гишүүд | B222270050, B232270148, B241910014, B241910044, B242270026 |
+
+## Багийн гишүүд
+
+| № | Оюутны код |
+|---|---|
+| 1 | B241910044 |
+| 2 | B241910014 |
+| 3 | B232270148 |
+| 4 | B222270050 |
 
 ## Зорилго
 

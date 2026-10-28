@@ -7,7 +7,7 @@
 <tr><th>Төсөл</th><td>Banker's Algorithm — Programming Project, Бүлэг 8 (Deadlocks)</td></tr>
 <tr><th>Хуваарилалтын код</th><td>V-1-13</td></tr>
 <tr><th>UI дүрслэл</th><td>Resource graph</td></tr>
-<tr><th>Гишүүд</th><td>B222270050, B232270148, B241910014, B241910044, B242270026</td></tr>
+<tr><th>Гишүүд</th><td>B241910044, B241910014, B232270148, B222270050</td></tr>
 <tr><th>Repository</th><td>github.com/Energyshifter8/V-1-13-Bankers-Algorithm (tag v1.0)</td></tr>
 </table>
 <div class="date">2026 он</div>
