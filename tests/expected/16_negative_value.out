@@ -1,0 +1,2 @@
+error: tests/data/invalid/negative.txt:2: value -2 is negative
+exit status: 1

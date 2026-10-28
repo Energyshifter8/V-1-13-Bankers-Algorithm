@@ -1,0 +1,2 @@
+error: tests/data/invalid/alloc_short.txt has 4 customers but tests/data/book_example_max.txt has 5
+exit status: 1

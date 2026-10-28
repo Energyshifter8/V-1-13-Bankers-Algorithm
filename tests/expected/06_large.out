@@ -1,0 +1,54 @@
+banker> SAFE
+Safety algorithm: Work = Available = (20, 15, 12, 10, 8)
+  T0   Need (5, 3, 2, 1, 4) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[0] = true
+  T1   Need (2, 7, 1, 3, 0) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[1] = true
+  T2   Need (8, 2, 4, 2, 1) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[2] = true
+  T3   Need (1, 1, 6, 0, 2) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[3] = true
+  T4   Need (3, 4, 3, 5, 3) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[4] = true
+  T5   Need (6, 0, 2, 2, 2) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[5] = true
+  T6   Need (0, 5, 5, 4, 1) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[6] = true
+  T7   Need (4, 2, 1, 3, 6) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[7] = true
+System is in a SAFE state. Safe sequence: <T0, T1, T2, T3, T4, T5, T6, T7>
+banker> RQ 0 5 3 2 1 4
+Request GRANTED for T0: (5, 3, 2, 1, 4)
+banker> RQ 1 2 7 1 3 0
+Request GRANTED for T1: (2, 7, 1, 3, 0)
+banker> RQ 2 8 2 4 2 1
+Request GRANTED for T2: (8, 2, 4, 2, 1)
+banker> RQ 3 1 1 6 0 2
+Request DENIED for T3: (1, 1, 6, 0, 2) - resources are not available, customer must wait
+banker> RQ 4 3 4 3 5 3
+Request DENIED for T4: (3, 4, 3, 5, 3) - resources are not available, customer must wait
+banker> RQ 5 1 0 0 0 0
+Request GRANTED for T5: (1, 0, 0, 0, 0)
+banker> SAFE
+Safety algorithm: Work = Available = (4, 3, 5, 4, 3)
+  T0   Need (0, 0, 0, 0, 0) <= Work (4, 3, 5, 4, 3) ? yes -> Work = (9, 6, 7, 5, 7), Finish[0] = true
+  T1   Need (0, 0, 0, 0, 0) <= Work (9, 6, 7, 5, 7) ? yes -> Work = (11, 13, 8, 8, 7), Finish[1] = true
+  T2   Need (0, 0, 0, 0, 0) <= Work (11, 13, 8, 8, 7) ? yes -> Work = (19, 15, 12, 10, 8), Finish[2] = true
+  T3   Need (1, 1, 6, 0, 2) <= Work (19, 15, 12, 10, 8) ? yes -> Work = (19, 15, 12, 10, 8), Finish[3] = true
+  T4   Need (3, 4, 3, 5, 3) <= Work (19, 15, 12, 10, 8) ? yes -> Work = (19, 15, 12, 10, 8), Finish[4] = true
+  T5   Need (5, 0, 2, 2, 2) <= Work (19, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[5] = true
+  T6   Need (0, 5, 5, 4, 1) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[6] = true
+  T7   Need (4, 2, 1, 3, 6) <= Work (20, 15, 12, 10, 8) ? yes -> Work = (20, 15, 12, 10, 8), Finish[7] = true
+System is in a SAFE state. Safe sequence: <T0, T1, T2, T3, T4, T5, T6, T7>
+banker> RL 2 8 2 4 2 1
+Released (8, 2, 4, 2, 1) from T2
+banker> RQ 4 0 0 0 0 0
+Request GRANTED for T4: (0, 0, 0, 0, 0)
+banker> *
+Available
+      A  B  C  D  E
+     12  5  9  6  4
+
+      Maximum           Allocation        Need
+      A  B  C  D  E     A  B  C  D  E     A  B  C  D  E
+T0    5  3  2  1  4     5  3  2  1  4     0  0  0  0  0
+T1    2  7  1  3  0     2  7  1  3  0     0  0  0  0  0
+T2    8  2  4  2  1     0  0  0  0  0     8  2  4  2  1
+T3    1  1  6  0  2     0  0  0  0  0     1  1  6  0  2
+T4    3  4  3  5  3     0  0  0  0  0     3  4  3  5  3
+T5    6  0  2  2  2     1  0  0  0  0     5  0  2  2  2
+T6    0  5  5  4  1     0  0  0  0  0     0  5  5  4  1
+T7    4  2  1  3  6     0  0  0  0  0     4  2  1  3  6
+exit status: 0

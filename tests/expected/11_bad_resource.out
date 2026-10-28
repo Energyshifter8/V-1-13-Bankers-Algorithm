@@ -1,0 +1,10 @@
+error: 'abc' is not a valid resource count
+Usage: ./bin/banker [-j] [-f maximum_file] [-a allocation_file] r1 r2 ... rm
+  r1..rm           available instances of each resource type
+  -f maximum_file  maximum demand of each customer, one line
+                   per customer (default: maximum.txt)
+  -a alloc_file    resources already allocated to each customer
+                   (optional, default: all zero)
+  -j               JSON output, one line per command (for the UI)
+Example: ./bin/banker -f maximum.txt 10 5 7 8
+exit status: 1

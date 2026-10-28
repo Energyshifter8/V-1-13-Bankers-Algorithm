@@ -1,0 +1,2 @@
+error: tests/data/invalid/empty.txt: file contains no customers
+exit status: 1

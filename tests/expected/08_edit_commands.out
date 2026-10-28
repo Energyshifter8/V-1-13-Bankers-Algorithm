@@ -1,0 +1,64 @@
+banker> # Build the Section 8.6.2 snapshot with editing commands
+banker> NEW 3 1
+New empty state: 3 customers, 1 resource types
+banker> AVAIL 3
+Available = (3)
+banker> MAX 0 10
+Maximum[T0] = (10)
+banker> MAX 1 4
+Maximum[T1] = (4)
+banker> MAX 2 9
+Maximum[T2] = (9)
+banker> ALLOC 0 5
+Allocation[T0] = (5)
+banker> ALLOC 1 2
+Allocation[T1] = (2)
+banker> ALLOC 2 2
+Allocation[T2] = (2)
+banker> ALLOC 2 10
+error: T2 allocation of A (10) would exceed its maximum (9)
+banker> MAX 0 4
+error: T0 allocation of A (5) would exceed its maximum (4)
+banker> NEW 0 1
+error: NEW needs 1..32 customers and 1..16 resource types
+banker> NEW 33 1
+error: NEW needs 1..32 customers and 1..16 resource types
+banker> AVAIL 1 2
+error: AVAIL expects 1 resource values, got 2
+banker> *
+Available
+      A
+      3
+
+      Maximum      Allocation   Need
+      A            A            A
+T0   10            5            5
+T1    4            2            2
+T2    9            2            7
+banker> SAFE
+Safety algorithm: Work = Available = (3)
+  T0   Need (5) <= Work (3) ? no
+  T1   Need (2) <= Work (3) ? yes -> Work = (5), Finish[1] = true
+  T2   Need (7) <= Work (5) ? no
+  T0   Need (5) <= Work (5) ? yes -> Work = (10), Finish[0] = true
+  T2   Need (7) <= Work (10) ? yes -> Work = (12), Finish[2] = true
+System is in a SAFE state. Safe sequence: <T1, T0, T2>
+banker> SAVE
+Current state saved as the initial state for RESET
+banker> RQ 2 1
+Request DENIED for T2: (1) - granting it would leave the system in an unsafe state
+banker> RQ 1 2
+Request GRANTED for T1: (2)
+banker> RESET
+State reset to the initial values
+banker> *
+Available
+      A
+      3
+
+      Maximum      Allocation   Need
+      A            A            A
+T0   10            5            5
+T1    4            2            2
+T2    9            2            7
+exit status: 0

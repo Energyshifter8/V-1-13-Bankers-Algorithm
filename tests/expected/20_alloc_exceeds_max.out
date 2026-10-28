@@ -1,0 +1,2 @@
+error: T4: allocation of resource A (9) exceeds its maximum (4)
+exit status: 1

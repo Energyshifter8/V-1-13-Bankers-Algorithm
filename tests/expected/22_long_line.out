@@ -1,0 +1,18 @@
+banker> # a 1500 character line must not be split into two commands
+banker> (line too long)
+error: line too long (max 1022 characters)
+banker> RQ 1 1 0 2
+Request GRANTED for T1: (1, 0, 2)
+banker> *
+Available
+      A  B  C
+      2  3  0
+
+      Maximum      Allocation   Need
+      A  B  C      A  B  C      A  B  C
+T0    7  5  3      0  1  0      7  4  3
+T1    3  2  2      3  0  2      0  2  0
+T2    9  0  2      3  0  2      6  0  0
+T3    2  2  2      2  1  1      0  1  1
+T4    4  3  3      0  0  2      4  3  1
+exit status: 0

@@ -1,0 +1,2 @@
+error: tests/data/invalid/wrong_count.txt:2: expected 4 values, found 3
+exit status: 1

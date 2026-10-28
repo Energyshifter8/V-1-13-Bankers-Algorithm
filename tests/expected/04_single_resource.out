@@ -1,0 +1,33 @@
+banker> # Section 8.6.2: 12 instances, safe sequence <T1, T0, T2>
+banker> SAFE
+Safety algorithm: Work = Available = (3)
+  T0   Need (5) <= Work (3) ? no
+  T1   Need (2) <= Work (3) ? yes -> Work = (5), Finish[1] = true
+  T2   Need (7) <= Work (5) ? no
+  T0   Need (5) <= Work (5) ? yes -> Work = (10), Finish[0] = true
+  T2   Need (7) <= Work (10) ? yes -> Work = (12), Finish[2] = true
+System is in a SAFE state. Safe sequence: <T1, T0, T2>
+banker> # T2 asks for one more instance -> unsafe
+banker> RQ 2 1
+Request DENIED for T2: (1) - granting it would leave the system in an unsafe state
+banker> RQ 1 2
+Request GRANTED for T1: (2)
+banker> RL 1 4
+Released (4) from T1
+banker> SAFE
+Safety algorithm: Work = Available = (5)
+  T0   Need (5) <= Work (5) ? yes -> Work = (10), Finish[0] = true
+  T1   Need (4) <= Work (10) ? yes -> Work = (10), Finish[1] = true
+  T2   Need (7) <= Work (10) ? yes -> Work = (12), Finish[2] = true
+System is in a SAFE state. Safe sequence: <T0, T1, T2>
+banker> *
+Available
+      A
+      5
+
+      Maximum      Allocation   Need
+      A            A            A
+T0   10            5            5
+T1    4            0            4
+T2    9            2            7
+exit status: 0

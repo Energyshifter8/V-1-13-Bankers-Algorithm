@@ -1,0 +1,29 @@
+warning: T4 maximum of resource B (6) exceeds the system total (5); T4 can never finish
+warning: the initial state is UNSAFE; every request will be denied (type SAFE for details)
+banker> # Commands from the Programming Project description
+banker> RQ 0 3 1 2 1
+Request DENIED for T0: (3, 1, 2, 1) - granting it would leave the system in an unsafe state
+banker> RL 4 1 2 3 1
+Release DENIED for T4: (1, 2, 3, 1) - release exceeds the customer's current allocation
+banker> *
+Available
+      A  B  C  D
+     10  5  7  8
+
+      Maximum        Allocation     Need
+      A  B  C  D     A  B  C  D     A  B  C  D
+T0    6  4  7  3     0  0  0  0     6  4  7  3
+T1    4  2  3  2     0  0  0  0     4  2  3  2
+T2    2  5  3  3     0  0  0  0     2  5  3  3
+T3    6  3  3  2     0  0  0  0     6  3  3  2
+T4    5  6  7  5     0  0  0  0     5  6  7  5
+banker> SAFE
+Safety algorithm: Work = Available = (10, 5, 7, 8)
+  T0   Need (6, 4, 7, 3) <= Work (10, 5, 7, 8) ? yes -> Work = (10, 5, 7, 8), Finish[0] = true
+  T1   Need (4, 2, 3, 2) <= Work (10, 5, 7, 8) ? yes -> Work = (10, 5, 7, 8), Finish[1] = true
+  T2   Need (2, 5, 3, 3) <= Work (10, 5, 7, 8) ? yes -> Work = (10, 5, 7, 8), Finish[2] = true
+  T3   Need (6, 3, 3, 2) <= Work (10, 5, 7, 8) ? yes -> Work = (10, 5, 7, 8), Finish[3] = true
+  T4   Need (5, 6, 7, 5) <= Work (10, 5, 7, 8) ? no
+  T4   Need (5, 6, 7, 5) <= Work (10, 5, 7, 8) ? no
+System is in an UNSAFE state. Cannot finish: T4
+exit status: 0

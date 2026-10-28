@@ -1,0 +1,2 @@
+error: tests/data/invalid/not_a_number.txt:2: invalid number 'x'
+exit status: 1

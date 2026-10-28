@@ -1,0 +1,47 @@
+banker> RQ
+error: RQ expects a customer number and 3 resource values, e.g. RQ 0 1 1 1
+banker> RQ 0
+error: RQ expects 3 resource values, got 0
+banker> RQ 0 1 2
+error: RQ expects 3 resource values, got 2
+banker> RQ 0 1 2 3 4
+error: RQ expects 3 resource values, got 4
+banker> RQ 7 1 1 1
+error: customer 7 does not exist (valid: 0..4)
+banker> RQ -1 0 0 0
+error: customer -1 does not exist (valid: 0..4)
+banker> RQ x 1 1 1
+error: RQ expects a customer number and 3 resource values, e.g. RQ 0 1 1 1
+banker> RQ 0 1 a 1
+error: invalid number 'a'
+banker> RQ 0 -1 0 0
+error: value -1 is negative
+banker> RQ 0 8 0 0
+Request DENIED for T0: (8, 0, 0) - request exceeds the customer's remaining need (maximum claim)
+banker> RL 1 3 0 0
+Release DENIED for T1: (3, 0, 0) - release exceeds the customer's current allocation
+banker> RL 9 0 0 0
+error: customer 9 does not exist (valid: 0..4)
+banker> FOO
+error: unknown command 'FOO'. Type HELP for the list of commands.
+banker> 
+banker>    # indented comment
+banker> help
+Commands:
+  RQ c r1 .. rm   customer c requests resources
+  RL c r1 .. rm   customer c releases resources
+  *               print available, maximum, allocation, need
+  SAFE            run the safety algorithm step by step
+  RESET           restore the initial state
+Editing:
+  NEW n m         empty state with n customers, m resources
+  AVAIL r1 .. rm  set the available vector
+  MAX c r1 .. rm  set the maximum demand of customer c
+  ALLOC c r1 ..rm set the allocation of customer c
+  SAVE            use the current state for RESET
+  HELP            show this help
+  QUIT            exit the program
+banker> rq 1 0 0 1
+Request GRANTED for T1: (0, 0, 1)
+banker> quit
+exit status: 0

@@ -1,0 +1,46 @@
+banker> # Same maximum file, but 6 instances of B so that T4 can finish
+banker> SAFE
+Safety algorithm: Work = Available = (10, 6, 7, 8)
+  T0   Need (6, 4, 7, 3) <= Work (10, 6, 7, 8) ? yes -> Work = (10, 6, 7, 8), Finish[0] = true
+  T1   Need (4, 2, 3, 2) <= Work (10, 6, 7, 8) ? yes -> Work = (10, 6, 7, 8), Finish[1] = true
+  T2   Need (2, 5, 3, 3) <= Work (10, 6, 7, 8) ? yes -> Work = (10, 6, 7, 8), Finish[2] = true
+  T3   Need (6, 3, 3, 2) <= Work (10, 6, 7, 8) ? yes -> Work = (10, 6, 7, 8), Finish[3] = true
+  T4   Need (5, 6, 7, 5) <= Work (10, 6, 7, 8) ? yes -> Work = (10, 6, 7, 8), Finish[4] = true
+System is in a SAFE state. Safe sequence: <T0, T1, T2, T3, T4>
+banker> RQ 0 3 1 2 1
+Request GRANTED for T0: (3, 1, 2, 1)
+banker> RL 4 1 2 3 1
+Release DENIED for T4: (1, 2, 3, 1) - release exceeds the customer's current allocation
+banker> RQ 4 1 2 3 1
+Request DENIED for T4: (1, 2, 3, 1) - granting it would leave the system in an unsafe state
+banker> RL 4 1 2 3 1
+Release DENIED for T4: (1, 2, 3, 1) - release exceeds the customer's current allocation
+banker> RL 0 1 1 1 1
+Released (1, 1, 1, 1) from T0
+banker> *
+Available
+      A  B  C  D
+      8  6  6  8
+
+      Maximum        Allocation     Need
+      A  B  C  D     A  B  C  D     A  B  C  D
+T0    6  4  7  3     2  0  1  0     4  4  6  3
+T1    4  2  3  2     0  0  0  0     4  2  3  2
+T2    2  5  3  3     0  0  0  0     2  5  3  3
+T3    6  3  3  2     0  0  0  0     6  3  3  2
+T4    5  6  7  5     0  0  0  0     5  6  7  5
+banker> RESET
+State reset to the initial values
+banker> *
+Available
+      A  B  C  D
+     10  6  7  8
+
+      Maximum        Allocation     Need
+      A  B  C  D     A  B  C  D     A  B  C  D
+T0    6  4  7  3     0  0  0  0     6  4  7  3
+T1    4  2  3  2     0  0  0  0     4  2  3  2
+T2    2  5  3  3     0  0  0  0     2  5  3  3
+T3    6  3  3  2     0  0  0  0     6  3  3  2
+T4    5  6  7  5     0  0  0  0     5  6  7  5
+exit status: 0

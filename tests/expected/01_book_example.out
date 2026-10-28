@@ -1,0 +1,67 @@
+banker> # Section 8.6.3.3: snapshot at time T0
+banker> *
+Available
+      A  B  C
+      3  3  2
+
+      Maximum      Allocation   Need
+      A  B  C      A  B  C      A  B  C
+T0    7  5  3      0  1  0      7  4  3
+T1    3  2  2      2  0  0      1  2  2
+T2    9  0  2      3  0  2      6  0  0
+T3    2  2  2      2  1  1      0  1  1
+T4    4  3  3      0  0  2      4  3  1
+banker> SAFE
+Safety algorithm: Work = Available = (3, 3, 2)
+  T0   Need (7, 4, 3) <= Work (3, 3, 2) ? no
+  T1   Need (1, 2, 2) <= Work (3, 3, 2) ? yes -> Work = (5, 3, 2), Finish[1] = true
+  T2   Need (6, 0, 0) <= Work (5, 3, 2) ? no
+  T3   Need (0, 1, 1) <= Work (5, 3, 2) ? yes -> Work = (7, 4, 3), Finish[3] = true
+  T4   Need (4, 3, 1) <= Work (7, 4, 3) ? yes -> Work = (7, 4, 5), Finish[4] = true
+  T0   Need (7, 4, 3) <= Work (7, 4, 5) ? yes -> Work = (7, 5, 5), Finish[0] = true
+  T2   Need (6, 0, 0) <= Work (7, 5, 5) ? yes -> Work = (10, 5, 7), Finish[2] = true
+System is in a SAFE state. Safe sequence: <T1, T3, T4, T0, T2>
+banker> # T1 requests (1,0,2) -> granted, Available = (2,3,0)
+banker> RQ 1 1 0 2
+Request GRANTED for T1: (1, 0, 2)
+banker> *
+Available
+      A  B  C
+      2  3  0
+
+      Maximum      Allocation   Need
+      A  B  C      A  B  C      A  B  C
+T0    7  5  3      0  1  0      7  4  3
+T1    3  2  2      3  0  2      0  2  0
+T2    9  0  2      3  0  2      6  0  0
+T3    2  2  2      2  1  1      0  1  1
+T4    4  3  3      0  0  2      4  3  1
+banker> SAFE
+Safety algorithm: Work = Available = (2, 3, 0)
+  T0   Need (7, 4, 3) <= Work (2, 3, 0) ? no
+  T1   Need (0, 2, 0) <= Work (2, 3, 0) ? yes -> Work = (5, 3, 2), Finish[1] = true
+  T2   Need (6, 0, 0) <= Work (5, 3, 2) ? no
+  T3   Need (0, 1, 1) <= Work (5, 3, 2) ? yes -> Work = (7, 4, 3), Finish[3] = true
+  T4   Need (4, 3, 1) <= Work (7, 4, 3) ? yes -> Work = (7, 4, 5), Finish[4] = true
+  T0   Need (7, 4, 3) <= Work (7, 4, 5) ? yes -> Work = (7, 5, 5), Finish[0] = true
+  T2   Need (6, 0, 0) <= Work (7, 5, 5) ? yes -> Work = (10, 5, 7), Finish[2] = true
+System is in a SAFE state. Safe sequence: <T1, T3, T4, T0, T2>
+banker> # T4 requests (3,3,0) -> resources not available
+banker> RQ 4 3 3 0
+Request DENIED for T4: (3, 3, 0) - resources are not available, customer must wait
+banker> # T0 requests (0,2,0) -> available but unsafe
+banker> RQ 0 0 2 0
+Request DENIED for T0: (0, 2, 0) - granting it would leave the system in an unsafe state
+banker> *
+Available
+      A  B  C
+      2  3  0
+
+      Maximum      Allocation   Need
+      A  B  C      A  B  C      A  B  C
+T0    7  5  3      0  1  0      7  4  3
+T1    3  2  2      3  0  2      0  2  0
+T2    9  0  2      3  0  2      6  0  0
+T3    2  2  2      2  1  1      0  1  1
+T4    4  3  3      0  0  2      4  3  1
+exit status: 0
