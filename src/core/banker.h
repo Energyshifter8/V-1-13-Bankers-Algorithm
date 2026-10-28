@@ -61,5 +61,7 @@ int  bank_is_safe(const bank_t *b, int sequence[], int *seq_len,
 
 /* Resource-request algorithm (Section 8.6.3.2) */
 bank_status_t bank_request(bank_t *b, int customer, const int request[]);
+bank_status_t bank_release(bank_t *b, int customer, const int release[]);
+const char   *bank_status_str(bank_status_t st);
 
 #endif /* BANKER_H */

@@ -252,3 +252,41 @@ bank_status_t bank_request(bank_t *b, int customer, const int request[])
     }
     return BANK_ERR_UNSAFE;
 }
+
+/*
+ * Release resources held by a customer. A customer cannot release more
+ * than it currently holds.
+ */
+bank_status_t bank_release(bank_t *b, int customer, const int release[])
+{
+    bank_status_t st = check_vector(b, customer, release);
+    if (st != BANK_OK)
+        return st;
+    if (!vec_leq(release, b->allocation[customer], b->m))
+        return BANK_ERR_EXCEEDS_ALLOC;
+
+    for (int j = 0; j < b->m; j++) {
+        b->available[j] += release[j];
+        b->allocation[customer][j] -= release[j];
+        b->need[customer][j] += release[j];
+    }
+    return BANK_OK;
+}
+
+const char *bank_status_str(bank_status_t st)
+{
+    switch (st) {
+    case BANK_OK:                return "ok";
+    case BANK_ERR_CUSTOMER:      return "invalid customer number";
+    case BANK_ERR_NEGATIVE:      return "negative values are not allowed";
+    case BANK_ERR_EXCEEDS_NEED:  return "request exceeds the customer's "
+                                        "remaining need (maximum claim)";
+    case BANK_ERR_UNAVAILABLE:   return "resources are not available, "
+                                        "customer must wait";
+    case BANK_ERR_UNSAFE:        return "granting it would leave the system "
+                                        "in an unsafe state";
+    case BANK_ERR_EXCEEDS_ALLOC: return "release exceeds the customer's "
+                                        "current allocation";
+    }
+    return "unknown error";
+}
