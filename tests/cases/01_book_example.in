@@ -1,0 +1,12 @@
+# Section 8.6.3.3: snapshot at time T0
+*
+SAFE
+# T1 requests (1,0,2) -> granted, Available = (2,3,0)
+RQ 1 1 0 2
+*
+SAFE
+# T4 requests (3,3,0) -> resources not available
+RQ 4 3 3 0
+# T0 requests (0,2,0) -> available but unsafe
+RQ 0 0 2 0
+*

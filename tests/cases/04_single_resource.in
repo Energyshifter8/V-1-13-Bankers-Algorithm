@@ -1,0 +1,8 @@
+# Section 8.6.2: 12 instances, safe sequence <T1, T0, T2>
+SAFE
+# T2 asks for one more instance -> unsafe
+RQ 2 1
+RQ 1 2
+RL 1 4
+SAFE
+*

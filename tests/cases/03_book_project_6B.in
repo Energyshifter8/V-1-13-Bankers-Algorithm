@@ -1,0 +1,10 @@
+# Same maximum file, but 6 instances of B so that T4 can finish
+SAFE
+RQ 0 3 1 2 1
+RL 4 1 2 3 1
+RQ 4 1 2 3 1
+RL 4 1 2 3 1
+RL 0 1 1 1 1
+*
+RESET
+*

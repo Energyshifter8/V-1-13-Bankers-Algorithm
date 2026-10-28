@@ -15,6 +15,7 @@ $(BIN)/unit_tests: tests/unit_tests.c $(CORE)/banker.c $(CORE)/banker.h | $(BIN)
 
 test: $(BIN)/banker $(BIN)/unit_tests
 	./$(BIN)/unit_tests
+	./tests/run_cli_tests.sh
 
 $(BIN):
 	mkdir -p $(BIN)
