@@ -236,7 +236,7 @@ xcode-select --install
 |---|---|
 | `tests/data/book_example_max.txt`, `book_example_alloc.txt` | Номын §8.6.3.3 жишээ (5 thread, A B C, Available 3 3 2) |
 | `tests/data/book_project_max.txt` | Programming Project-ийн maximum файл (`10 5 7 8`) |
-| `tests/data/single_resource_*.txt` | Номын §8.6.2 жишээ (12 instance-тэй нэг нөөц) |
+| `tests/data/single_resource_*.txt` | Номын §8.6.1 жишээ (12 instance-тэй нэг нөөц) |
 | `tests/data/unsafe_*.txt` | Өөрсдийн тест: эхнээсээ unsafe төлөв |
 | `tests/data/large_max.txt` | Өөрсдийн тест: 8 thread × 5 нөөц, хоосон зайгаар тусгаарласан |
 | `examples/*.txt` | UI-ийн сценари (CLI-д ч `<` ашиглан өгч болно) |
@@ -282,7 +282,7 @@ CLI тест бүрийн хүлээгдсэн гаралт `tests/expected/<н�
 | `RQ 1 1 0 2` | GRANTED, Available = (2, 3, 0) |
 | `RQ 4 3 3 0` | DENIED — resources are not available |
 | `RQ 0 0 2 0` | DENIED — unsafe |
-| §8.6.2, `RQ 2 1` | DENIED — unsafe |
+| §8.6.1, `RQ 2 1` | DENIED — unsafe |
 | Номын project оролт `10 5 7 8` | UNSAFE (T4 дуусч чадахгүй), бүх RQ татгалзана |
 | Мөн оролт `10 6 7 8`, `RQ 0 3 1 2 1` | GRANTED |
 

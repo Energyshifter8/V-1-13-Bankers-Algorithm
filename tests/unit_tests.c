@@ -113,7 +113,7 @@ static void test_release(void)
     CHECK(b.need[1][0] == 3);
 }
 
-/* Section 8.6.2: 12 instances, T2 asking for one more makes it unsafe */
+/* Section 8.6.1: 12 instances, T2 asking for one more makes it unsafe */
 static void test_single_resource(void)
 {
     bank_t b;
@@ -222,7 +222,7 @@ int main(void)
         {"request: textbook 8.6.3.3 sequence", test_request_sequence_book},
         {"request: invalid input", test_request_errors},
         {"release", test_release},
-        {"single resource: textbook 8.6.2", test_single_resource},
+        {"single resource: textbook 8.6.1", test_single_resource},
         {"unsafe state", test_unsafe_state},
         {"safety trace callback", test_trace},
         {"parse vector", test_parse_vector},

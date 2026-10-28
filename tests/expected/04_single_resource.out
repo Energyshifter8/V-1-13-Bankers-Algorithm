@@ -1,4 +1,4 @@
-banker> # Section 8.6.2: 12 instances, safe sequence <T1, T0, T2>
+banker> # Section 8.6.1: 12 instances, safe sequence <T1, T0, T2>
 banker> SAFE
 Safety algorithm: Work = Available = (3)
   T0   Need (5) <= Work (3) ? no

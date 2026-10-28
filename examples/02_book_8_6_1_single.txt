@@ -1,4 +1,4 @@
-# title: Textbook 8.6.2 (12 tape drives)
+# title: Textbook 8.6.1 (12 instances)
 # description: One resource type with 12 instances. Safe sequence <T1, T0, T2>; RQ 2 1 makes the state unsafe and is denied.
 NEW 3 1
 AVAIL 3

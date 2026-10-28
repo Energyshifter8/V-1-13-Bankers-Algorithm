@@ -1,4 +1,4 @@
-banker> # Build the Section 8.6.2 snapshot with editing commands
+banker> # Build the Section 8.6.1 snapshot with editing commands
 banker> NEW 3 1
 New empty state: 3 customers, 1 resource types
 banker> AVAIL 3

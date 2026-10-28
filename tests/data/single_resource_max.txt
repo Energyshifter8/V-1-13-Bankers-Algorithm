@@ -1,4 +1,4 @@
-# Section 8.6.2 example: 12 instances of one resource type
+# Section 8.6.1 example: 12 instances of one resource type
 # Run with: ./bin/banker -f tests/data/single_resource_max.txt -a tests/data/single_resource_alloc.txt 3
 10
 4
