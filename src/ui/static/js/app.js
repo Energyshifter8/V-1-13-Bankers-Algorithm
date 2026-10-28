@@ -4,6 +4,7 @@
 
 import { api } from "./api.js";
 import { renderGraph, renderLegend } from "./graph.js";
+import { frame, lastPosition } from "./stepper.js";
 
 const $ = (id) => document.getElementById(id);
 const letter = (j) => String.fromCharCode(65 + j);
@@ -14,6 +15,8 @@ const ui = {
   prev: null,      // state before the last command (to highlight changes)
   draft: null,     // values typed in the matrix editor
   examples: [],
+  pos: 0,          // position in the safety trace (see stepper.js)
+  timer: null,
 };
 
 // ------------------------------------------------------------------
@@ -50,15 +53,12 @@ function lastRequest() {
 
 function renderGraphView() {
   const s = ui.resp.state;
-  const safety = ui.resp.safety;
-  const order = Array(s.n).fill(null);
-  safety.sequence.forEach((c, k) => (order[c] = k));
-  const status = order.map((o) => (o === null ? "blocked" : "finished"));
+  const f = frame(s, ui.resp.safety, ui.pos);
   renderGraph($("graph"), {
     state: s,
-    status,
-    order,
-    work: null,
+    status: f.status,
+    order: f.order,
+    work: ui.pos > 0 ? f.work : null,
     request: lastRequest(),
     show: {
       alloc: $("show-alloc").checked,
@@ -66,6 +66,58 @@ function renderGraphView() {
       labels: $("show-labels").checked,
     },
   });
+}
+
+function renderStepper() {
+  const s = ui.resp.state;
+  const safety = ui.resp.safety;
+  const f = frame(s, safety, ui.pos);
+  $("step-info").innerHTML = f.html;
+
+  const finish = el("span", { class: "finish-cells" });
+  f.finish.forEach((v, i) =>
+    finish.append(el("span", { class: (v ? "t" : "") + (f.current === i ? " cur" : "") },
+      `T${i}:${v ? "T" : "F"}`)));
+  $("work-finish").replaceChildren(
+    el("div", {}, "Work = ", el("span", { class: "vec" }, vec(f.work))),
+    el("div", {}, "Finish = ", finish),
+  );
+
+  const seq = $("sequence");
+  seq.replaceChildren(el("span", { class: "muted" }, "Safe sequence: "));
+  f.sequence.forEach((c, k) => {
+    if (k) seq.append(el("span", { class: "arrow" }, "→"));
+    seq.append(el("span", { class: "chip done" }, "T" + c));
+  });
+  if (f.done && !safety.safe) {
+    f.finish.forEach((v, i) => !v && seq.append(el("span", { class: "chip fail" }, "T" + i + " ✗")));
+  }
+  $("step-play").textContent = ui.timer ? "⏸ Pause" : "▶ Play";
+}
+
+function goTo(pos) {
+  ui.pos = Math.max(0, Math.min(pos, lastPosition(ui.resp.safety)));
+  renderGraphView();
+  renderStepper();
+}
+
+function stopPlaying() {
+  clearInterval(ui.timer);
+  ui.timer = null;
+}
+
+function togglePlay() {
+  if (ui.timer) {
+    stopPlaying();
+  } else {
+    if (ui.pos >= lastPosition(ui.resp.safety)) ui.pos = 0;
+    ui.timer = setInterval(() => {
+      if (ui.pos >= lastPosition(ui.resp.safety)) stopPlaying();
+      else goTo(ui.pos + 1);
+      renderStepper();
+    }, Number($("step-speed").value));
+  }
+  renderStepper();
 }
 
 function renderStateTable() {
@@ -222,12 +274,15 @@ function update(resp) {
   ui.prev = ui.resp ? ui.resp.state : null;
   ui.resp = resp;
   ui.draft = draftFromState(resp.state);
+  stopPlaying();
+  ui.pos = lastPosition(resp.safety);
   render();
 }
 
 function render() {
   renderBadge();
   renderGraphView();
+  renderStepper();
   renderStateTable();
   renderEditor();
 }
@@ -259,6 +314,15 @@ function bindControls() {
   for (const id of ["show-alloc", "show-need", "show-labels"]) {
     $(id).addEventListener("change", () => ui.resp && renderGraphView());
   }
+
+  $("step-first").addEventListener("click", () => { stopPlaying(); goTo(0); });
+  $("step-prev").addEventListener("click", () => { stopPlaying(); goTo(ui.pos - 1); });
+  $("step-next").addEventListener("click", () => { stopPlaying(); goTo(ui.pos + 1); });
+  $("step-last").addEventListener("click", () => { stopPlaying(); goTo(Infinity); });
+  $("step-play").addEventListener("click", togglePlay);
+  $("step-speed").addEventListener("change", () => {
+    if (ui.timer) { stopPlaying(); togglePlay(); }
+  });
 
   $("btn-apply").addEventListener("click", () =>
     guard(async () => {
