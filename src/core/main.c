@@ -568,6 +568,26 @@ static int run_json_command(char *line)
 /* Start-up                                                            */
 /* ------------------------------------------------------------------ */
 
+#define LINE_SIZE 1024
+#define LONG_LINE_MSG "error: line too long (max %d characters)\n"
+
+/*
+ * Read one command line. Returns 1 on success, 0 at the end of input and
+ * -1 when the line did not fit (the rest of it is discarded so that it is
+ * not run as a second command).
+ */
+static int read_line(char *buf, int size)
+{
+    if (fgets(buf, size, stdin) == NULL)
+        return 0;
+    if (strchr(buf, '\n') != NULL || feof(stdin))
+        return 1;
+    int c;
+    while ((c = getchar()) != EOF && c != '\n')
+        ;
+    return -1;
+}
+
 static void usage(const char *prog)
 {
     fprintf(stderr,
@@ -669,14 +689,23 @@ int main(int argc, char *argv[])
     bank_update_need(&bank);
     initial = bank;
 
-    char line[1024];
+    char line[LINE_SIZE];
+    int status;
     if (json_mode) {
         reset_result();
         outcome = "ready";
         json_response(NULL, "");
-        while (fgets(line, sizeof(line), stdin) != NULL)
-            if (run_json_command(line))
+        while ((status = read_line(line, sizeof(line))) != 0) {
+            if (status < 0) {
+                char msg[64];
+                snprintf(msg, sizeof(msg), LONG_LINE_MSG, LINE_SIZE - 2);
+                reset_result();
+                outcome = "error";
+                json_response("(line too long)", msg);
+            } else if (run_json_command(line)) {
                 break;
+            }
+        }
         return 0;
     }
 
@@ -699,8 +728,15 @@ int main(int argc, char *argv[])
             printf("banker> ");
             fflush(stdout);
         }
-        if (fgets(line, sizeof(line), stdin) == NULL)
+        status = read_line(line, sizeof(line));
+        if (status == 0)
             break;
+        if (status < 0) {
+            if (!interactive)
+                printf("banker> (line too long)\n");
+            printf(LONG_LINE_MSG, LINE_SIZE - 2);
+            continue;
+        }
         if (!interactive)
             printf("banker> %s%s", line,
                    strchr(line, '\n') ? "" : "\n");
