@@ -15,10 +15,11 @@
 
 | Гишүүн | Хариуцах ажил | Commit/file |
 |---|---|---|
-| B241910044 | Repository, C core (`src/core/`), CLI, README | `banker.c`, `main.c`, `Makefile`, `README.md` |
+| B241910044 | Repository, C core (`src/core/`), CLI | `banker.c`, `main.c`, `Makefile` |
 | B222270050 | Тест, туршилтын өгөгдөл | `tests/` |
 | B232270148 | Interactive UI, resource graph | `src/ui/` |
-| B241910014 | Тайлан, Manual | `docs/REPORT.md`, `docs/MANUAL.md` |
+| B241910014 | Тайлан | `docs/REPORT.md` |
+| B242270026 | Manual, README | `docs/MANUAL.md`, `README.md` |
 
 ## Долоо хоногийн төлөвлөгөө
 
