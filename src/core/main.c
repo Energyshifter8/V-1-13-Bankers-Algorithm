@@ -89,28 +89,40 @@ static void print_row(const int v[], int m, int w)
 
 static void print_state(const bank_t *b)
 {
+    static const char *titles[3] = {"Maximum", "Allocation", "Need"};
+    const int (*rows[3])[MAX_RESOURCES] = {b->maximum, b->allocation,
+                                           b->need};
     int w = column_width(b);
     int block = w * b->m;
+    int gap = 13 - block; /* every block is at least 13 columns wide */
+    if (gap < 3)
+        gap = 3;
 
     printf("Available\n%4s", "");
     print_header(b->m, w);
     printf("\n%4s", "");
     print_row(b->available, b->m, w);
     printf("\n\n%4s", "");
-    printf("%-*s   %-*s   %s\n", block, "  Maximum", block, "  Allocation",
-           "  Need");
+    for (int k = 0; k < 3; k++) {
+        if (k < 2)
+            printf("%*s%-*s", w - 1, "", block + gap - w + 1, titles[k]);
+        else
+            printf("%*s%s\n", w - 1, "", titles[k]);
+    }
     printf("%4s", "");
     for (int k = 0; k < 3; k++) {
         print_header(b->m, w);
-        printf(k < 2 ? "   " : "\n");
+        if (k < 2)
+            printf("%*s", gap, "");
     }
+    putchar('\n');
     for (int i = 0; i < b->n; i++) {
         printf("T%-3d", i);
-        print_row(b->maximum[i], b->m, w);
-        printf("   ");
-        print_row(b->allocation[i], b->m, w);
-        printf("   ");
-        print_row(b->need[i], b->m, w);
+        for (int k = 0; k < 3; k++) {
+            print_row(rows[k][i], b->m, w);
+            if (k < 2)
+                printf("%*s", gap, "");
+        }
         putchar('\n');
     }
 }
