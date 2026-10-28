@@ -47,7 +47,7 @@ figure img { max-width: 100%; max-height: 125mm; border: 1px solid #dde2ec; }
 figcaption { font-size: 9pt; color: #555; margin-top: 3pt; }
 img { max-width: 100%; }
 .pagebreak { break-after: page; }
-.cover { height: 250mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.cover { break-after: page; height: 245mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
 .cover .uni { font-size: 12pt; color: #555; }
 .cover .title { font-size: 24pt; font-weight: 700; margin: 18pt 0 6pt; color: #1d2433; }
 .cover .subtitle { font-size: 14pt; color: #2f5bd3; margin-bottom: 30pt; }
