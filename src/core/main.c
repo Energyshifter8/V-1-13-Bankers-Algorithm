@@ -112,6 +112,57 @@ static void print_state(const bank_t *b)
     }
 }
 
+static void print_sequence(const int seq[], int len)
+{
+    putchar('<');
+    for (int k = 0; k < len; k++)
+        printf(k ? ", T%d" : "T%d", seq[k]);
+    putchar('>');
+}
+
+static void print_trace_step(const bank_t *b, int customer, int ok,
+                             const int work[], void *ctx)
+{
+    (void)ctx;
+    printf("  T%-3d Need ", customer);
+    print_vector(b->need[customer], b->m);
+    printf(" <= Work ");
+    print_vector(work, b->m);
+    if (ok) {
+        int next[MAX_RESOURCES];
+        for (int j = 0; j < b->m; j++)
+            next[j] = work[j] + b->allocation[customer][j];
+        printf(" ? yes -> Work = ");
+        print_vector(next, b->m);
+        printf(", Finish[%d] = true\n", customer);
+    } else {
+        printf(" ? no\n");
+    }
+}
+
+static void cmd_safe(void)
+{
+    int seq[MAX_CUSTOMERS], len;
+
+    printf("Safety algorithm: Work = Available = ");
+    print_vector(bank.available, bank.m);
+    putchar('\n');
+    if (bank_is_safe(&bank, seq, &len, print_trace_step, NULL)) {
+        printf("System is in a SAFE state. Safe sequence: ");
+        print_sequence(seq, len);
+        putchar('\n');
+    } else {
+        int finished[MAX_CUSTOMERS] = {0};
+        for (int k = 0; k < len; k++)
+            finished[seq[k]] = 1;
+        printf("System is in an UNSAFE state. Cannot finish:");
+        for (int i = 0; i < bank.n; i++)
+            if (!finished[i])
+                printf(" T%d", i);
+        putchar('\n');
+    }
+}
+
 /* Warn about customers whose maximum claim exceeds the system total. */
 static void check_total(const bank_t *b)
 {
@@ -142,6 +193,7 @@ static void print_help(void)
            "  RQ c r1 .. rm   customer c requests resources\n"
            "  RL c r1 .. rm   customer c releases resources\n"
            "  *               print available, maximum, allocation, need\n"
+           "  SAFE            run the safety algorithm step by step\n"
            "  RESET           restore the initial state\n"
            "  HELP            show this help\n"
            "  QUIT            exit the program\n");
@@ -245,6 +297,8 @@ static int run_command(char *line)
         cmd_release(args);
     else if (strcmp(s, "*") == 0)
         print_state(&bank);
+    else if (strcasecmp(s, "SAFE") == 0)
+        cmd_safe();
     else if (strcasecmp(s, "RESET") == 0) {
         bank = initial;
         printf("State reset to the initial values\n");
@@ -333,6 +387,9 @@ int main(int argc, char *argv[])
     initial = bank;
 
     check_total(&bank);
+    if (!bank_is_safe(&bank, NULL, NULL, NULL, NULL))
+        fprintf(stderr, "warning: the initial state is UNSAFE; every request "
+                "will be denied (type SAFE for details)\n");
 
     int interactive = isatty(STDIN_FILENO);
     if (interactive)
