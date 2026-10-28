@@ -44,4 +44,15 @@ typedef enum {
 typedef void (*bank_trace_fn)(const bank_t *b, int customer, int ok,
                               const int work[], void *ctx);
 
+#include <stddef.h>
+
+/* Initialisation and input */
+void bank_init(bank_t *b, int n, int m);
+void bank_update_need(bank_t *b);
+int  bank_parse_vector(const char *text, int out[], int max_count,
+                       char *err, size_t errlen);
+int  bank_load_matrix(const char *path, int matrix[][MAX_RESOURCES], int m,
+                      char *err, size_t errlen);
+int  bank_validate(const bank_t *b, char *err, size_t errlen);
+
 #endif /* BANKER_H */
