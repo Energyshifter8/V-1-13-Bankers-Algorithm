@@ -19,40 +19,42 @@ import tempfile
 from pathlib import Path
 
 CSS = """
-@page {
-  size: A4;
-  margin: 18mm 17mm 20mm 17mm;
-  @bottom-center { content: counter(page); font: 9pt "Noto Sans", sans-serif; color: #666; }
-}
-@page :first { @bottom-center { content: none; } }
-body { font: 10.5pt/1.5 "Noto Sans", "DejaVu Sans", Arial, sans-serif; color: #1d2433; }
-h1 { font-size: 17pt; margin: 0 0 10pt; padding-bottom: 4pt; border-bottom: 2px solid #2f5bd3; break-before: page; }
-h1.first, .cover + h1 { break-before: auto; }
-h2 { font-size: 13pt; margin: 16pt 0 6pt; color: #2f5bd3; break-after: avoid; }
+@page { size: A4; margin: 18mm 20mm 18mm 20mm; }
+body { font: 10.5pt/1.6 "Liberation Sans", Helvetica, Arial, sans-serif; color: #111; }
+h1 { font-size: 14pt; margin: 16pt 0 8pt; break-after: avoid; }
+h2 { font-size: 12pt; margin: 14pt 0 6pt; break-after: avoid; }
 h3 { font-size: 11pt; margin: 12pt 0 4pt; break-after: avoid; }
-p { margin: 0 0 7pt; text-align: justify; }
-ul, ol { margin: 0 0 7pt; padding-left: 18pt; }
+p { margin: 0 0 8pt; }
+ul, ol { margin: 0 0 8pt; padding-left: 22pt; }
 li { margin: 1.5pt 0; }
-code { font: 9pt "DejaVu Sans Mono", monospace; background: #f1f3f8; padding: 0 2pt; border-radius: 2pt; }
-pre { font: 8.4pt/1.35 "DejaVu Sans Mono", monospace; background: #f4f6fa; border: 1px solid #dde2ec;
-      border-radius: 4pt; padding: 6pt 8pt; white-space: pre-wrap; break-inside: avoid; margin: 0 0 8pt; }
+code { font: 9pt "DejaVu Sans Mono", monospace; background: #f2f2f2; padding: 0 2pt; border-radius: 2pt; }
+pre { font: 8.4pt/1.35 "DejaVu Sans Mono", monospace; background: #f5f5f5; border: 1px solid #e2e2e2;
+      border-radius: 3pt; padding: 6pt 8pt; white-space: pre-wrap; break-inside: avoid; margin: 0 0 8pt; }
 pre code { background: none; padding: 0; font-size: inherit; }
-table { border-collapse: collapse; width: 100%; margin: 4pt 0 9pt; font-size: 9.3pt; break-inside: avoid; }
-th, td { border: 1px solid #c9cfdc; padding: 3pt 5pt; vertical-align: top; text-align: left; }
-th { background: #eef2fb; }
-blockquote { margin: 0 0 8pt; padding: 4pt 10pt; border-left: 3px solid #2f5bd3; background: #f4f6fa; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 10pt; font-size: 9.3pt; break-inside: avoid; }
+th, td { border: 1px solid #cfcfcf; padding: 3pt 5pt; vertical-align: top; text-align: left; }
+th { background: #f2f2f2; }
+blockquote { margin: 0 0 8pt; padding: 4pt 10pt; border-left: 3px solid #999; background: #f5f5f5; }
 blockquote p { margin: 0; }
 figure { margin: 6pt 0 10pt; text-align: center; break-inside: avoid; }
-figure img { max-width: 100%; max-height: 110mm; border: 1px solid #dde2ec; }
+figure img { max-width: 100%; max-height: 110mm; border: 1px solid #e2e2e2; }
 figcaption { font-size: 9pt; color: #555; margin-top: 3pt; }
 img { max-width: 100%; }
 .pagebreak { break-after: page; }
-.cover { break-after: page; height: 245mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
-.cover .uni { font-size: 12pt; color: #555; }
-.cover .title { font-size: 24pt; font-weight: 700; margin: 18pt 0 6pt; color: #1d2433; }
-.cover .subtitle { font-size: 14pt; color: #2f5bd3; margin-bottom: 30pt; }
-.cover table { width: 70%; margin: 0 auto; font-size: 10.5pt; }
-.cover .date { margin-top: 30pt; color: #555; }
+.cover { break-after: page; height: 258mm; display: flex; flex-direction: column; align-items: center;
+         text-align: center; font: 11pt/1.7 "Times New Roman", "Liberation Serif", serif; }
+.cover .uni { font-weight: 700; font-size: 10.5pt; margin-top: 6mm; }
+.cover .logo { height: 24mm; margin: 9mm 0 0; }
+.cover .title { font-size: 28pt; font-weight: 700; margin-top: 20mm; line-height: 1.3; }
+.cover .course { font-size: 21pt; font-weight: 700; line-height: 1.3; margin-top: 2mm; }
+.cover .term { margin-top: 8mm; }
+.cover .topic { margin-top: 16mm; }
+.cover .prepared { margin-top: 14mm; }
+.cover .members { margin-top: 6mm; }
+.cover .checked { margin-top: 6mm; }
+.cover .city { margin-top: auto; }
+.doc-title { font-size: 17pt; font-weight: 700; padding-bottom: 5pt; border-bottom: 1px solid #333; margin: 0 0 12pt; }
+.meta { font-size: 10pt; }
 """
 
 

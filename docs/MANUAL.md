@@ -1,16 +1,17 @@
 <div class="cover">
-<div class="uni">F.CSM302 Үйлдлийн систем · Бие даалт 1</div>
-<div class="title">Banker's Algorithm</div>
-<div class="subtitle">Хэрэглэгчийн болон Operational гарын авлага (Manual)</div>
-<table>
-<tr><th>Хуваарилалтын код</th><td>V-1-13</td></tr>
-<tr><th>Төсөл</th><td>Banker's Algorithm (OSC 10th ed., Бүлэг 8)</td></tr>
-<tr><th>UI дүрслэл</th><td>Resource graph</td></tr>
-<tr><th>Repository</th><td>github.com/Energyshifter8/V-1-13-Bankers-Algorithm</td></tr>
-<tr><th>Хувилбар</th><td>v1.0</td></tr>
-</table>
-<div class="date">2026 он</div>
+<div class="uni">ШИНЖЛЭХ УХААН, ТЕХНОЛОГИЙН ИХ СУРГУУЛЬ<br>МЭДЭЭЛЭЛ, ХОЛБООНЫ ТЕХНОЛОГИЙН СУРГУУЛЬ</div>
+<img class="logo" src="images/must_logo.png" alt="">
+<div class="title">Бие даалт 1. Гарын авлага</div>
+<div class="course">F.CSM302 Үйлдлийн систем</div>
+<div class="term">2026-2027 оны хичээлийн жилийн намар</div>
+<div class="topic"><b>Сэдэв:</b> V-1-13 Banker's Algorithm (Deadlocks)</div>
+<div class="prepared">Бэлтгэсэн: /................................../ /B241910044/</div>
+<div class="members">Багийн гишүүд:<br>/B241910014/<br>/B232270148/<br>/B222270050/<br>/B242270026/</div>
+<div class="checked">Шалгасан: /....................................../ Г. Ганбат /F.CS10/</div>
+<div class="city">Улаанбаатар хот<br>2026 он</div>
 </div>
+<div class="doc-title">V-1-13 Banker's Algorithm: Manual</div>
+<p class="meta"><b>Хувилбар:</b> v1.0 <b>UI дүрслэл:</b> Resource graph <b>GitHub:</b> https://github.com/Energyshifter8/V-1-13-Bankers-Algorithm</p>
 
 # 1. Хэрэглэгчийн заавар
 

@@ -1,17 +1,17 @@
 <div class="cover">
-<div class="uni">F.CSM302 Үйлдлийн систем · Бие даалт 1</div>
-<div class="title">Banker's Algorithm</div>
-<div class="subtitle">Судалгаа, хэрэгжилт, туршилтын тайлан</div>
-<table>
-<tr><th>Хичээл</th><td>F.CSM302 Үйлдлийн систем</td></tr>
-<tr><th>Төсөл</th><td>Banker's Algorithm — Programming Project, Бүлэг 8 (Deadlocks)</td></tr>
-<tr><th>Хуваарилалтын код</th><td>V-1-13</td></tr>
-<tr><th>UI дүрслэл</th><td>Resource graph</td></tr>
-<tr><th>Гишүүд</th><td>B241910044, B241910014, B232270148, B222270050, B242270026</td></tr>
-<tr><th>Repository</th><td>github.com/Energyshifter8/V-1-13-Bankers-Algorithm (tag v1.0)</td></tr>
-</table>
-<div class="date">2026 он</div>
+<div class="uni">ШИНЖЛЭХ УХААН, ТЕХНОЛОГИЙН ИХ СУРГУУЛЬ<br>МЭДЭЭЛЭЛ, ХОЛБООНЫ ТЕХНОЛОГИЙН СУРГУУЛЬ</div>
+<img class="logo" src="images/must_logo.png" alt="">
+<div class="title">Бие даалт 1. Тайлан</div>
+<div class="course">F.CSM302 Үйлдлийн систем</div>
+<div class="term">2026-2027 оны хичээлийн жилийн намар</div>
+<div class="topic"><b>Сэдэв:</b> V-1-13 Banker's Algorithm (Deadlocks)</div>
+<div class="prepared">Бэлтгэсэн: /................................../ /B241910044/</div>
+<div class="members">Багийн гишүүд:<br>/B241910014/<br>/B232270148/<br>/B222270050/<br>/B242270026/</div>
+<div class="checked">Шалгасан: /....................................../ Г. Ганбат /F.CS10/</div>
+<div class="city">Улаанбаатар хот<br>2026 он</div>
 </div>
+<div class="doc-title">F.CSM302 Үйлдлийн систем: Бие даалт 1. Тайлан</div>
+<p class="meta"><b>Хуваарилалтын код:</b> V-1-13 <b>Төсөл:</b> Banker's Algorithm (Operating System Concepts 2018, Бүлэг 8, Deadlocks) <b>UI дүрслэл:</b> Resource graph <b>Гишүүд:</b> B241910044; B241910014; B232270148; B222270050; B242270026<br><b>GitHub:</b> https://github.com/Energyshifter8/V-1-13-Bankers-Algorithm (tag v1.0)</p>
 
 # Хураангуй
 
