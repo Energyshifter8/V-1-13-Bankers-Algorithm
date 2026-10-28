@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banker's Algorithm – V-1-13</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Banker's Algorithm <span class="muted">· Resource graph</span></h1>
+      <p class="subtitle">F.CSM302 Үйлдлийн систем · БД1 · V-1-13 · OSC 10th ed., §8.6.3</p>
+    </div>
+    <div class="topbar-right">
+      <span id="safe-badge" class="badge">…</span>
+      <span id="conn" class="conn" title="C программтай холболт">● C backend</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Left: controls -->
+    <aside class="controls">
+      <section class="card">
+        <h2>1. Сценари</h2>
+        <div class="row">
+          <select id="example-select" aria-label="Сценари сонгох"></select>
+          <button id="example-load">Ачаалах</button>
+        </div>
+        <p id="example-desc" class="hint"></p>
+        <div class="row">
+          <button id="btn-reset" title="SAVE хийсэн анхны төлөв рүү буцах (RESET)">Reset</button>
+          <button id="btn-restart" class="ghost" title="C процессыг дахин эхлүүлэх">Restart</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2. Өгөгдөл (Available, Max, Allocation)</h2>
+        <div class="row size-row">
+          <label>n (thread) <input id="size-n" type="number" min="1" max="32" value="5"></label>
+          <label>m (resource) <input id="size-m" type="number" min="1" max="16" value="3"></label>
+          <button id="btn-new" title="Хоосон төлөв үүсгэх (NEW n m)">NEW</button>
+        </div>
+        <div id="matrix-editor" class="matrix-editor"></div>
+        <div class="row">
+          <button id="btn-apply" class="primary">Хадгалах (Apply)</button>
+          <button id="btn-discard" class="ghost">Цуцлах</button>
+        </div>
+        <p class="hint">Need = Max − Allocation-ийг C программ тооцоолно. Засварласан нүд шараар тодорно.</p>
+      </section>
+
+      <section class="card">
+        <h2>3. Request / Release</h2>
+        <div class="row">
+          <label>Thread <select id="req-customer"></select></label>
+        </div>
+        <div id="req-vector" class="vector-inputs"></div>
+        <div class="row">
+          <button id="btn-request" class="primary">Request (RQ)</button>
+          <button id="btn-release">Release (RL)</button>
+        </div>
+        <div id="result" class="result" hidden></div>
+      </section>
+
+      <section class="card">
+        <h2>4. Команд</h2>
+        <form id="console-form" class="row">
+          <input id="console-input" type="text" placeholder="RQ 1 1 0 2, RL 4 1 0 0, *, SAFE, HELP" autocomplete="off" spellcheck="false">
+          <button type="submit">Илгээх</button>
+        </form>
+        <ol id="history" class="history"></ol>
+      </section>
+    </aside>
+
+    <!-- Right: visualisation -->
+    <section class="viz">
+      <div class="card">
+        <div class="card-head">
+          <h2>Resource graph</h2>
+          <div class="toggles">
+            <label><input type="checkbox" id="show-alloc" checked> Allocation</label>
+            <label><input type="checkbox" id="show-need" checked> Need (claim)</label>
+            <label><input type="checkbox" id="show-labels" checked> Тоо</label>
+          </div>
+        </div>
+        <div id="view-switch" class="view-switch" hidden>
+          <button data-view="current" class="active">Одоогийн төлөв</button>
+          <button data-view="trial">Татгалзсан хүсэлтийн туршилтын төлөв</button>
+        </div>
+        <div id="graph" class="graph"></div>
+        <div id="legend" class="legend"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Safety algorithm (§8.6.3.1) — алхамчилсан</h2>
+          <div class="stepper">
+            <button id="step-first" title="Эхлэл">⏮</button>
+            <button id="step-prev" title="Өмнөх">◀</button>
+            <button id="step-play" title="Тоглуулах">▶ Play</button>
+            <button id="step-next" title="Дараах">▶</button>
+            <button id="step-last" title="Төгсгөл">⏭</button>
+            <label class="speed">Хурд
+              <input id="step-speed" type="range" min="200" max="2000" step="100" value="900">
+            </label>
+          </div>
+        </div>
+        <div id="step-info" class="step-info"></div>
+        <div id="work-finish" class="work-finish"></div>
+        <div id="sequence" class="sequence"></div>
+      </div>
+
+      <div class="card">
+        <h2>Төлөвийн хүснэгт (C программын гаралт)</h2>
+        <div id="state-table" class="state-table"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Бүх тооцоолол <code>bin/banker -j</code> (C) программ дээр хийгдэнэ; энэ хуудас зөвхөн үр дүнг дүрсэлнэ.
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
