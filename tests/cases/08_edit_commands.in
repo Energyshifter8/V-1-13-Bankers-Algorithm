@@ -1,0 +1,21 @@
+# Build the Section 8.6.2 snapshot with editing commands
+NEW 3 1
+AVAIL 3
+MAX 0 10
+MAX 1 4
+MAX 2 9
+ALLOC 0 5
+ALLOC 1 2
+ALLOC 2 2
+ALLOC 2 10
+MAX 0 4
+NEW 0 1
+NEW 33 1
+AVAIL 1 2
+*
+SAFE
+SAVE
+RQ 2 1
+RQ 1 2
+RESET
+*

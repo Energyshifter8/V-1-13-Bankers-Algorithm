@@ -210,6 +210,12 @@ static void print_help(void)
            "  *               print available, maximum, allocation, need\n"
            "  SAFE            run the safety algorithm step by step\n"
            "  RESET           restore the initial state\n"
+           "Editing:\n"
+           "  NEW n m         empty state with n customers, m resources\n"
+           "  AVAIL r1 .. rm  set the available vector\n"
+           "  MAX c r1 .. rm  set the maximum demand of customer c\n"
+           "  ALLOC c r1 ..rm set the allocation of customer c\n"
+           "  SAVE            use the current state for RESET\n"
            "  HELP            show this help\n"
            "  QUIT            exit the program\n");
 }
@@ -288,6 +294,78 @@ static void cmd_release(char *args)
     }
 }
 
+/* ------------------------------------------------------------------ */
+/* Editing commands (used by the interactive UI and test scripts)      */
+/* ------------------------------------------------------------------ */
+
+/* NEW n m: start an empty state with n customers and m resource types */
+static void cmd_new(char *args)
+{
+    int v[2];
+    char err[256];
+    int count = bank_parse_vector(args, v, 2, err, sizeof(err));
+    if (count != 2) {
+        printf("error: NEW expects the number of customers and resource "
+               "types, e.g. NEW 5 3\n");
+        return;
+    }
+    if (v[0] < 1 || v[0] > MAX_CUSTOMERS || v[1] < 1 ||
+        v[1] > MAX_RESOURCES) {
+        printf("error: NEW needs 1..%d customers and 1..%d resource "
+               "types\n", MAX_CUSTOMERS, MAX_RESOURCES);
+        return;
+    }
+    bank_init(&bank, v[0], v[1]);
+    printf("New empty state: %d customers, %d resource types\n", v[0],
+           v[1]);
+}
+
+/* AVAIL r1 .. rm: set the available vector */
+static void cmd_avail(char *args)
+{
+    int v[MAX_RESOURCES];
+    char err[256];
+    int count = bank_parse_vector(args, v, MAX_RESOURCES, err, sizeof(err));
+    if (count < 0) {
+        printf("error: %s\n", err);
+        return;
+    }
+    if (count != bank.m) {
+        printf("error: AVAIL expects %d resource values, got %d\n", bank.m,
+               count);
+        return;
+    }
+    memcpy(bank.available, v, sizeof(int) * bank.m);
+    printf("Available = ");
+    print_vector(v, bank.m);
+    putchar('\n');
+}
+
+/* MAX c r1 .. rm / ALLOC c r1 .. rm: set one row of a matrix */
+static void cmd_set_row(char *args, int is_max)
+{
+    const char *cmd = is_max ? "MAX" : "ALLOC";
+    int c, v[MAX_RESOURCES];
+    if (parse_customer_vector(cmd, args, &c, v) < 0)
+        return;
+
+    for (int j = 0; j < bank.m; j++) {
+        int max = is_max ? v[j] : bank.maximum[c][j];
+        int alloc = is_max ? bank.allocation[c][j] : v[j];
+        if (alloc > max) {
+            printf("error: T%d allocation of %c (%d) would exceed its "
+                   "maximum (%d)\n", c, 'A' + j, alloc, max);
+            return;
+        }
+    }
+    memcpy(is_max ? bank.maximum[c] : bank.allocation[c], v,
+           sizeof(int) * bank.m);
+    bank_update_need(&bank);
+    printf("%s[T%d] = ", is_max ? "Maximum" : "Allocation", c);
+    print_vector(v, bank.m);
+    putchar('\n');
+}
+
 /* Returns 0 to continue, 1 to quit. */
 static int run_command(char *line)
 {
@@ -317,7 +395,18 @@ static int run_command(char *line)
     else if (strcasecmp(s, "RESET") == 0) {
         bank = initial;
         printf("State reset to the initial values\n");
-    } else if (strcasecmp(s, "HELP") == 0 || strcmp(s, "?") == 0)
+    } else if (strcasecmp(s, "SAVE") == 0) {
+        initial = bank;
+        printf("Current state saved as the initial state for RESET\n");
+    } else if (strcasecmp(s, "NEW") == 0)
+        cmd_new(args);
+    else if (strcasecmp(s, "AVAIL") == 0)
+        cmd_avail(args);
+    else if (strcasecmp(s, "MAX") == 0)
+        cmd_set_row(args, 1);
+    else if (strcasecmp(s, "ALLOC") == 0)
+        cmd_set_row(args, 0);
+    else if (strcasecmp(s, "HELP") == 0 || strcmp(s, "?") == 0)
         print_help();
     else if (strcasecmp(s, "QUIT") == 0 || strcasecmp(s, "EXIT") == 0)
         return 1;
