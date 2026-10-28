@@ -43,7 +43,7 @@ th { background: #eef2fb; }
 blockquote { margin: 0 0 8pt; padding: 4pt 10pt; border-left: 3px solid #2f5bd3; background: #f4f6fa; }
 blockquote p { margin: 0; }
 figure { margin: 6pt 0 10pt; text-align: center; break-inside: avoid; }
-figure img { max-width: 100%; max-height: 125mm; border: 1px solid #dde2ec; }
+figure img { max-width: 100%; max-height: 110mm; border: 1px solid #dde2ec; }
 figcaption { font-size: 9pt; color: #555; margin-top: 3pt; }
 img { max-width: 100%; }
 .pagebreak { break-after: page; }
