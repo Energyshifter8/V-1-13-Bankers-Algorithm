@@ -64,4 +64,18 @@ bank_status_t bank_request(bank_t *b, int customer, const int request[]);
 bank_status_t bank_release(bank_t *b, int customer, const int release[]);
 const char   *bank_status_str(bank_status_t st);
 
+/*
+ * Deadlock detection (Section 8.7.2). request[i] is what Ti is currently
+ * waiting for. Threads that hold nothing cannot be part of a deadlock.
+ * deadlocked[i] is set to 1 for every deadlocked Ti; returns how many.
+ * trace (may be NULL) is called for every examined thread.
+ */
+typedef void (*bank_detect_trace_fn)(const bank_t *b, int customer, int ok,
+                                     const int request[], const int work[],
+                                     void *ctx);
+
+int bank_detect_deadlock(const bank_t *b, int request[][MAX_RESOURCES],
+                         int deadlocked[], bank_detect_trace_fn trace,
+                         void *ctx);
+
 #endif /* BANKER_H */

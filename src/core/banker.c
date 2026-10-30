@@ -290,3 +290,57 @@ const char *bank_status_str(bank_status_t st)
     }
     return "unknown error";
 }
+
+/*
+ * Deadlock-detection algorithm (Section 8.7.2).
+ *
+ *  1. Work = Available. Finish[i] = false if Allocation_i != 0,
+ *     otherwise true (a thread holding nothing cannot be deadlocked).
+ *  2. Find an i with Finish[i] == false and Request_i <= Work.
+ *     If no such i exists, go to step 4.
+ *  3. Work = Work + Allocation_i, Finish[i] = true. Go to step 2.
+ *  4. Every i with Finish[i] == false is deadlocked.
+ *
+ * Differs from bank_is_safe() in step 1 and in using Request instead of
+ * Need (see Practice Exercise 8.10).
+ */
+int bank_detect_deadlock(const bank_t *b, int request[][MAX_RESOURCES],
+                         int deadlocked[], bank_detect_trace_fn trace,
+                         void *ctx)
+{
+    int work[MAX_RESOURCES];
+    int finish[MAX_CUSTOMERS];
+    int progress = 1, count = 0;
+
+    memcpy(work, b->available, sizeof(work));
+    for (int i = 0; i < b->n; i++) {
+        int holds = 0;
+        for (int j = 0; j < b->m; j++)
+            if (b->allocation[i][j] != 0)
+                holds = 1;
+        finish[i] = !holds;
+    }
+
+    while (progress) {
+        progress = 0;
+        for (int i = 0; i < b->n; i++) {
+            if (finish[i])
+                continue;
+            int ok = vec_leq(request[i], work, b->m);
+            if (trace != NULL)
+                trace(b, i, ok, request[i], work, ctx);
+            if (!ok)
+                continue;
+            for (int j = 0; j < b->m; j++)
+                work[j] += b->allocation[i][j];
+            finish[i] = 1;
+            progress = 1;
+        }
+    }
+
+    for (int i = 0; i < b->n; i++) {
+        deadlocked[i] = !finish[i];
+        count += deadlocked[i];
+    }
+    return count;
+}
