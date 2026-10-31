@@ -549,16 +549,6 @@ Commit-ийн бүрэн түүхийг `git log --oneline` эсвэл GitHub-и
 | `tests: add unit tests for bank_detect_deadlock (OSC 8.7.2)` | `tests/unit_tests.c` |
 | `docs: ...` | Тайлан, Manual, README |
 
-## Хавсралт A. Ажлын хуваарилалт
-
-| Гишүүн | Хариуцсан ажил | Commit / файл |
-|--------|----------------|---------------|
-| B241910044 Б.Тэмүүлэн | *(Тэмүүлэн бөглөнө)* | |
-| B241910014 Б.Намуунаа | Deadlock detection (§8.7.2): `bank_detect_deadlock()`, `WAIT`/`DETECT` командууд, тестүүд (24, 25), тайлан, Manual, README-ийн шинэчлэл | `src/core/banker.c`, `banker.h`, `main.c`, `tests/cases/24_*`, `25_*`, `tests/data/detect_*`, `docs/REPORT.md`, `docs/MANUAL.md`, `README.md` (branch `feature/deadlock-detection`) |
-| B232270148 А.Бат-Эрдэнэ | *(бөглөнө)* | |
-| B222270050 Ё.Болормаа | *(бөглөнө)* | |
-| B242270026 Н.Лууболд | *(бөглөнө)* | |
-
 # Ашигласан материал
 
 1. A. Silberschatz, P. B. Galvin, G. Gagne. *Operating System Concepts*, 10th ed. Wiley, 2018.
