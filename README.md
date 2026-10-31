@@ -85,6 +85,7 @@ RL c r1 .. rm     customer c releases resources      (номын команд)
 SAFE              run the safety algorithm step by step
 RESET             restore the initial state
 NEW n m | AVAIL r.. | MAX c r.. | ALLOC c r.. | SAVE   edit the state
+WAIT c r1 .. rm | DETECT   deadlock detection, Section 8.7.2
 HELP | QUIT
 ```
 
@@ -103,7 +104,7 @@ HELP | QUIT
 ```text
 $ make test
 62 checks, 0 failed        # tests/unit_tests.c
-23 passed, 0 failed        # tests/run_cli_tests.sh (tests/expected/*.out-тэй харьцуулна)
+25 passed, 0 failed        # tests/run_cli_tests.sh (tests/expected/*.out-тэй харьцуулна)
 Ran 8 tests ... OK         # tests/test_ui_server.py
 ```
 

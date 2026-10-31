@@ -1,0 +1,34 @@
+warning: the initial state is UNSAFE; every request will be denied (type SAFE for details)
+banker> # Section 8.7.2: Available = (0,0,0), T0 and T2 are not waiting
+banker> WAIT 1 2 0 2
+Request[T1] = (2, 0, 2)
+banker> WAIT 3 1 0 0
+Request[T3] = (1, 0, 0)
+banker> WAIT 4 0 0 2
+Request[T4] = (0, 0, 2)
+banker> # no deadlock: T0, T2, T3, T4, T1 can finish in this order
+banker> DETECT
+Deadlock detection: Work = Available = (0, 0, 0)
+  T0   Request (0, 0, 0) <= Work (0, 0, 0) ? yes -> Work = (0, 1, 0), Finish[0] = true
+  T1   Request (2, 0, 2) <= Work (0, 1, 0) ? no
+  T2   Request (0, 0, 0) <= Work (0, 1, 0) ? yes -> Work = (3, 1, 3), Finish[2] = true
+  T3   Request (1, 0, 0) <= Work (3, 1, 3) ? yes -> Work = (5, 2, 4), Finish[3] = true
+  T4   Request (0, 0, 2) <= Work (5, 2, 4) ? yes -> Work = (5, 2, 6), Finish[4] = true
+  T1   Request (2, 0, 2) <= Work (5, 2, 6) ? yes -> Work = (7, 2, 6), Finish[1] = true
+No deadlock: every thread can finish.
+banker> # T2 makes one more request for C -> T1, T2, T3, T4 deadlocked
+banker> WAIT 2 0 0 1
+Request[T2] = (0, 0, 1)
+banker> DETECT
+Deadlock detection: Work = Available = (0, 0, 0)
+  T0   Request (0, 0, 0) <= Work (0, 0, 0) ? yes -> Work = (0, 1, 0), Finish[0] = true
+  T1   Request (2, 0, 2) <= Work (0, 1, 0) ? no
+  T2   Request (0, 0, 1) <= Work (0, 1, 0) ? no
+  T3   Request (1, 0, 0) <= Work (0, 1, 0) ? no
+  T4   Request (0, 0, 2) <= Work (0, 1, 0) ? no
+  T1   Request (2, 0, 2) <= Work (0, 1, 0) ? no
+  T2   Request (0, 0, 1) <= Work (0, 1, 0) ? no
+  T3   Request (1, 0, 0) <= Work (0, 1, 0) ? no
+  T4   Request (0, 0, 2) <= Work (0, 1, 0) ? no
+System is DEADLOCKED. Deadlocked threads: T1 T2 T3 T4
+exit status: 0

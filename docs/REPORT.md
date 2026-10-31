@@ -29,7 +29,7 @@ Interactive UI нь Python стандарт сангийн жижиг серве
 ажиллуулж, хариуг нь **Resource graph** (assignment, claim, request ирмэгтэй
 процесс–нөөцийн граф) ба safety algorithm-ийн алхамчилсан харагдацаар үзүүлнэ.
 
-**Туршилт.** C unit тест (11 бүлэг, 62 шалгалт), CLI-ийн 23 тохиолдол (хүлээгдсэн
+**Туршилт.** C unit тест (11 бүлэг, 62 шалгалт), CLI-ийн 25 тохиолдол (хүлээгдсэн
 гаралттай харьцуулна), серверийн 8 integration тест бүгд амжилттай давсан.
 AddressSanitizer/UBSan-тай build дээр ч алдаа гараагүй.
 
@@ -54,9 +54,11 @@ Resource graph дүрслэлээр харуулах, үр дүнг тайлан
 - Номын шаардлага: n харилцагч, m нөөц, 4 өгөгдлийн бүтэц, safety ба resource-request
   algorithm, `RQ`/`RL`/`*` командууд, командын мөрөөр Available, файлаас Maximum.
 - Нэмэлт: Allocation файл, `SAFE` алхамчилсан гаралт, `RESET`/`SAVE`, засварлах командууд,
-  JSON горим, интерактив вэб UI, автомат тестүүд.
+  deadlock detection (`WAIT`/`DETECT`, §8.7.2), JSON горим, интерактив вэб UI,
+  автомат тестүүд.
 - Хамрахгүй: олон процессын бодит synchronization (номын 10-р хэвлэлийн төсөл нь
-  нэг урсгалтай интерактив программ шаарддаг). Deadlock detection алгоритм (§8.7).
+  нэг урсгалтай интерактив программ шаарддаг). Deadlock-оос сэргээх (§8.8). Detection-ийн дүрслэл UI-ийн граф дээр хараахан
+  нэмээгүй (зөвхөн CLI).
 
 # 2. Сурах бичгийн шаардлага
 
@@ -145,6 +147,40 @@ Ti-ийн `Request_i` хүсэлтэд:
 илүү, Ti-ийн Need мөн `Request_i`-ээр илүү байна. Ti дууссаны дараа хоёр төлөвийн Work
 тэнцүү болно. Тэгэхээр олголтын өмнөх төлөв ч safe байх ёстой. Программ эхний төлөв unsafe
 үед "every request will be denied" гэж анхааруулдаг нь үүнд үндэслэсэн.
+
+## 3.6 Deadlock detection algorithm (§8.7.2)
+
+Avoidance-ийн оронд системийг deadlock-д орохыг зөвшөөрч, дараа нь илрүүлэх арга
+(§8.7) бий. Олон instance-тэй нөөцөд Available, Allocation болон **Request**
+матриц ашиглана. `Request[i][j] = k` нь Ti одоо Rj-ийн k instance-ийг хүлээж байна
+гэсэн үг.
+
+1. `Work = Available`. `Allocation_i != 0` бол `Finish[i] = false`, үгүй бол `true`.
+2. `Finish[i] == false` ба `Request_i <= Work` байх i-г ол. Олдохгүй бол 4-р алхам.
+3. `Work = Work + Allocation_i`, `Finish[i] = true`, 2-р алхам руу буц.
+4. `Finish[i] == false` байх бүх Ti deadlock-д орсон.
+
+Алгоритм нь O(m × n²) хүндрэлтэй. Safety algorithm-оос гурван ялгаатай:
+
+- Need-ийн оронд Request-ийг ашиглана.
+- Юу ч эзэмшээгүй thread (`Allocation_i = 0`) эхнээсээ дууссан гэж тооцогдоно.
+  Тэр thread нөөц хүлээж байсан ч хэнийг ч хаадаггүй тул deadlock-ийн мөчлөгт орж
+  чадахгүй.
+- Request ≤ Work болмогц Ti дараа нь нэмэлт нөөц хүсэхгүй гэж найдаж (optimistic
+  assumption) түүний нөөцийг буцаана. Энэ таамаг буруу бол deadlock дараагийн
+  detection дээр илэрнэ.
+
+Practice Exercise 8.10-д заасны дагуу `Max = Waiting + Allocation` гэж тооцож
+safety algorithm-ийн кодыг дахин ашиглаж болно. Гэхдээ дээрх хоёр дахь ялгаа
+(`Allocation_i = 0` thread-ийг эхнээс нь дууссан гэж үзэх) нь safety algorithm-д
+байхгүй тул бид тусдаа функц бичсэн.
+
+Хэрэгжилт: `bank_detect_deadlock()` (`src/core/banker.c`) нь `bank_is_safe()`-тэй
+ижил бүтэцтэй: thread-үүдийг 0..n−1 дарааллаар давтан шалгаж, нэг бүтэн давталтад
+ахиц гараагүй үед зогсоно. Алхам бүрийг trace callback-аар мэдээлдэг. CLI-д хоёр
+команд нэмсэн: `WAIT c r1 .. rm` нь Request матрицын мөрийг тохируулна, `DETECT`
+алгоритмыг алхам бүрээр хэвлэж ажиллуулна. `RESET` ба `NEW` Request матрицыг
+цэвэрлэнэ.
 
 # 4. Системийн зохиомж
 
@@ -306,7 +342,7 @@ Repository-г GitHub-аас шинээр clone хийж `make && make test` аж
 | Түвшин | Хэрэгсэл | Тоо |
 |---|---|---|
 | Unit (core функц) | `tests/unit_tests.c` | 11 бүлэг, 62 шалгалт |
-| CLI (end-to-end) | `tests/run_cli_tests.sh`: `tests/cases/*.args/.in` → `tests/expected/*.out` | 23 тохиолдол |
+| CLI (end-to-end) | `tests/run_cli_tests.sh`: `tests/cases/*.args/.in` → `tests/expected/*.out` | 25 тохиолдол |
 | UI сервер + JSON | `tests/test_ui_server.py` (unittest) | 8 тест |
 | UI (гар аргаар) | Headless Chromium-оор товч дарж screenshot авсан (энэ тайлангийн зургууд) | 15 зураг |
 
@@ -392,6 +428,45 @@ Ran 8 tests ... OK           (server)
 
 ![Зураг 12. 8 thread × 5 нөөцтэй систем](images/ui_large.png)
 
+## 8.4 Deadlock detection (§8.7.2): CLI-ийн бодит гаралт
+
+Номын §8.7.2 жишээ: 5 thread, нөөц A=7, B=2, C=6, `Available = (0, 0, 0)`,
+Allocation `010, 200, 303, 211, 002` (`tests/data/detect_alloc.txt`). Detection
+Max-ийг ашигладаггүй, `detect_max.txt` нь зөвхөн `Allocation <= Max` шалгалтыг
+давуулахад хэрэгтэй.
+
+```
+banker> WAIT 1 2 0 2
+banker> WAIT 3 1 0 0
+banker> WAIT 4 0 0 2
+banker> DETECT
+Deadlock detection: Work = Available = (0, 0, 0)
+  T0   Request (0, 0, 0) <= Work (0, 0, 0) ? yes -> Work = (0, 1, 0), Finish[0] = true
+  T1   Request (2, 0, 2) <= Work (0, 1, 0) ? no
+  T2   Request (0, 0, 0) <= Work (0, 1, 0) ? yes -> Work = (3, 1, 3), Finish[2] = true
+  T3   Request (1, 0, 0) <= Work (3, 1, 3) ? yes -> Work = (5, 2, 4), Finish[3] = true
+  T4   Request (0, 0, 2) <= Work (5, 2, 4) ? yes -> Work = (5, 2, 6), Finish[4] = true
+  T1   Request (2, 0, 2) <= Work (5, 2, 6) ? yes -> Work = (7, 2, 6), Finish[1] = true
+No deadlock: every thread can finish.
+banker> WAIT 2 0 0 1
+banker> DETECT
+...
+System is DEADLOCKED. Deadlocked threads: T1 T2 T3 T4
+```
+
+| № | Тест | Хүлээгдсэн | Бодит |
+|---|------|------------|-------|
+| 24 | §8.7.2, эхний Request матриц | Deadlock байхгүй | `No deadlock`, дараалал T0, T2, T3, T4, T1 (✔) |
+| 24 | T2 нэмэлт C (0,0,1) хүсэх | T1, T2, T3, T4 deadlock | `DEADLOCKED: T1 T2 T3 T4`, номтой таарна (✔) |
+| 25 | WAIT хийгээгүй | Deadlock байхгүй | `No deadlock` (✔) |
+| 25 | Буруу WAIT (customer 9, 2 утга, сөрөг, тоо биш, аргументгүй) | Бүр ойлгомжтой алдаа | `error: ...` 5 мессеж (✔) |
+| 25 | T1 нь A-г 8 хүлээнэ (системд 7) | Зөвхөн T1 deadlock | `DEADLOCKED: T1` (✔) |
+| 25 | `RESET`-ийн дараа | Request матриц цэвэр | `No deadlock` (✔) |
+
+Хязгаарлалт: detection зөвхөн deadlock-ийг мэдээлнэ, сэргээхгүй (§8.8). UI-ийн
+Resource graph дээр deadlock-д орсон thread-ийг тодруулах дүрслэл хараахан
+нэмээгүй.
+
 # 9. Хэлэлцүүлэг
 
 **Үр дүнгийн тайлбар.** Номын §8.6.3.3, §8.6.1 жишээнүүдийн бүх дүгнэлтийг программ
@@ -401,8 +476,8 @@ thread-уудыг индексийн дарааллаар давтан шалг�
 нь алдаа биш. Харин stepper дээр яг энэ дарааллыг алхам бүрээр нь харж болно.
 
 **Номын жишээ оролтын ажиглалт.** Programming Project-ийн тайлбарт өгсөн Maximum файлын
-сүүлийн мөр `5,6,7,5` нь B нөөцөөс 6 шаардана. Гэтэл `./a.out 10 5 7 8` үед B-ийн нийт тоо
-5. Тиймээс T4 хэзээ ч дуусахгүй, систем эхнээсээ unsafe болж бүх `RQ` татгалзагдана
+сүүлийн мөр `5,6,7,5` нь B нөөцөөс 6 шаардана. Гэтэл `./a.out 10 5 7 8` үед B-ийн нийт тоо 5.
+Тиймээс T4 хэзээ ч дуусахгүй, систем эхнээсээ unsafe болж бүх `RQ` татгалзагдана
 (тайлбарын жишээ `RQ 0 3 1 2 1` ч мөн адил). Манай программ ачаалах үед анхааруулга гаргаж, UI дээр T4-ийг
 улаанаар тэмдэглэнэ. Available-ийг `10 6 7 8` болгоход хүсэлтүүд хэвийн шийдэгдэнэ
 (Зураг 8, 9).
@@ -432,8 +507,9 @@ thread-уудыг индексийн дарааллаар давтан шалг�
 - Resource graph бүхий интерактив UI нь C программтай шууд холбогдож, өгөгдөл засварлах,
   хүсэлт оруулах, safety algorithm-ийг алхамчлах, татгалзсан хүсэлтийн шалтгааныг харуулах
   боломжтой.
-- Номын жишээнүүдийн үр дүнг бүрэн давтаж, 93 автомат тестээр зөв ажиллагааг нотолсон
-  (62 unit шалгалт, 23 CLI тохиолдол, 8 серверийн тест).
+- Номын жишээнүүдийн үр дүнг бүрэн давтаж, 95 автомат тестээр зөв ажиллагааг нотолсон
+  (62 unit шалгалт, 25 CLI тохиолдол, 8 серверийн тест).
+- Deadlock detection (§8.7.2) нэмж, номын жишээгээр (T1..T4 deadlock) батлав.
 - Номын жишээ оролт эхнээсээ unsafe байгааг илрүүлсэн.
 
 # GitHub дээрх ажиллагаа
@@ -452,6 +528,29 @@ thread-уудыг индексийн дарааллаар давтан шалг�
 | Баримт бичиг | `docs: architecture diagram and screenshots`, `docs: user and operational manual`, `docs: report` |
 
 Commit-ийн бүрэн түүхийг `git log --oneline` эсвэл GitHub-ийн *Commits* хуудаснаас харна.
+
+## Deadlock detection нэмсэн ажил (namuunaa)
+
+`feature/deadlock-detection` branch дээр тусдаа commit-үүдээр хийж, Pull Request-ээр
+хүргэсэн:
+
+| Commit | Агуулга |
+|--------|---------|
+| `core: add deadlock detection algorithm (OSC 8.7.2)` | `banker.c`, `banker.h` |
+| `cli: add WAIT and DETECT commands` | `main.c` |
+| `tests: update HELP expected output for WAIT and DETECT` | `tests/expected/07_command_errors.out` |
+| `tests: add deadlock detection cases (OSC 8.7.2 example and edge cases)` | `tests/cases/24_*`, `25_*`, `tests/data/detect_*` |
+| `docs: ...` | Тайлан, Manual, README |
+
+## Хавсралт A. Ажлын хуваарилалт
+
+| Гишүүн | Хариуцсан ажил | Commit / файл |
+|--------|----------------|---------------|
+| B241910044 Б.Тэмүүлэн | *(Тэмүүлэн бөглөнө)* | |
+| B241910014 Б.Намуунаа | Deadlock detection (§8.7.2): `bank_detect_deadlock()`, `WAIT`/`DETECT` командууд, тестүүд (24, 25), тайлан, Manual, README-ийн шинэчлэл | `src/core/banker.c`, `banker.h`, `main.c`, `tests/cases/24_*`, `25_*`, `tests/data/detect_*`, `docs/REPORT.md`, `docs/MANUAL.md`, `README.md` (branch `feature/deadlock-detection`) |
+| B232270148 А.Бат-Эрдэнэ | *(бөглөнө)* | |
+| B222270050 Ё.Болормаа | *(бөглөнө)* | |
+| B242270026 Н.Лууболд | *(бөглөнө)* | |
 
 # Ашигласан материал
 

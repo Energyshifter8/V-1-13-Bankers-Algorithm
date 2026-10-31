@@ -37,6 +37,7 @@
 static bank_t bank;
 static bank_t initial;  /* state after loading, used by RESET */
 static bank_status_t last_status;
+static int waiting[MAX_CUSTOMERS][MAX_RESOURCES]; /* Request matrix (8.7.2) */
 
 static FILE *out;              /* command output: stdout or a buffer (-j) */
 static int json_mode;
@@ -205,6 +206,56 @@ static void cmd_safe(void)
     }
 }
 
+static void print_detect_step(const bank_t *b, int customer, int ok,
+                              const int request[], const int work[],
+                              void *ctx)
+{
+    (void)ctx;
+    fprintf(out, "  T%-3d Request ", customer);
+    print_vector(request, b->m);
+    fprintf(out, " <= Work ");
+    print_vector(work, b->m);
+    if (ok) {
+        int next[MAX_RESOURCES];
+        for (int j = 0; j < b->m; j++)
+            next[j] = work[j] + b->allocation[customer][j];
+        fprintf(out, " ? yes -> Work = ");
+        print_vector(next, b->m);
+        fprintf(out, ", Finish[%d] = true\n", customer);
+    } else {
+        fprintf(out, " ? no\n");
+    }
+}
+
+static void cmd_detect(void)
+{
+    int dead[MAX_CUSTOMERS];
+
+    fprintf(out, "Deadlock detection: Work = Available = ");
+    print_vector(bank.available, bank.m);
+    fputc('\n', out);
+    for (int i = 0; i < bank.n; i++) {
+        int holds = 0;
+        for (int j = 0; j < bank.m; j++)
+            if (bank.allocation[i][j] != 0)
+                holds = 1;
+        if (!holds)
+            fprintf(out, "  T%-3d holds nothing -> Finish[%d] = true\n", i, i);
+    }
+
+    int count = bank_detect_deadlock(&bank, waiting, dead,
+                                     print_detect_step, NULL);
+    if (count == 0) {
+        fprintf(out, "No deadlock: every thread can finish.\n");
+    } else {
+        fprintf(out, "System is DEADLOCKED. Deadlocked threads:");
+        for (int i = 0; i < bank.n; i++)
+            if (dead[i])
+                fprintf(out, " T%d", i);
+        fputc('\n', out);
+    }
+}
+
 /*
  * Find customers whose maximum claim exceeds the system total; such a
  * customer can never finish. Returns the number of warnings.
@@ -260,6 +311,8 @@ static void print_help(void)
            "  MAX c r1 .. rm  set the maximum demand of customer c\n"
            "  ALLOC c r1 ..rm set the allocation of customer c\n"
            "  SAVE            use the current state for RESET\n"
+           "  WAIT c r1 .. rm set what customer c is waiting for (Request)\n"
+           "  DETECT          run deadlock detection (Section 8.7.2)\n"
            "  HELP            show this help\n"
            "  QUIT            exit the program\n");
 }
@@ -381,6 +434,7 @@ static void cmd_new(char *args)
         return;
     }
     bank_init(&bank, v[0], v[1]);
+    memset(waiting, 0, sizeof(waiting));
     fprintf(out, "New empty state: %d customers, %d resource types\n", v[0],
            v[1]);
 }
@@ -431,6 +485,18 @@ static void cmd_set_row(char *args, int is_max)
     fputc('\n', out);
 }
 
+/* WAIT c r1 .. rm: set the Request row of customer c (for DETECT) */
+static void cmd_wait(char *args)
+{
+    int c, v[MAX_RESOURCES];
+    if (parse_customer_vector("WAIT", args, &c, v) < 0)
+        return;
+    memcpy(waiting[c], v, sizeof(int) * bank.m);
+    fprintf(out, "Request[T%d] = ", c);
+    print_vector(v, bank.m);
+    fputc('\n', out);
+}
+
 /* Returns 0 to continue, 1 to quit. */
 static int run_command(char *line)
 {
@@ -459,6 +525,7 @@ static int run_command(char *line)
         cmd_safe();
     else if (strcasecmp(s, "RESET") == 0) {
         bank = initial;
+        memset(waiting, 0, sizeof(waiting));
         fprintf(out, "State reset to the initial values\n");
     } else if (strcasecmp(s, "SAVE") == 0) {
         initial = bank;
@@ -471,6 +538,10 @@ static int run_command(char *line)
         cmd_set_row(args, 1);
     else if (strcasecmp(s, "ALLOC") == 0)
         cmd_set_row(args, 0);
+    else if (strcasecmp(s, "WAIT") == 0)
+        cmd_wait(args);
+    else if (strcasecmp(s, "DETECT") == 0)
+        cmd_detect();
     else if (strcasecmp(s, "HELP") == 0 || strcmp(s, "?") == 0)
         print_help();
     else if (strcasecmp(s, "QUIT") == 0 || strcasecmp(s, "EXIT") == 0)

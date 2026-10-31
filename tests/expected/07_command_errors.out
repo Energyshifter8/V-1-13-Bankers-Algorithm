@@ -39,6 +39,8 @@ Editing:
   MAX c r1 .. rm  set the maximum demand of customer c
   ALLOC c r1 ..rm set the allocation of customer c
   SAVE            use the current state for RESET
+  WAIT c r1 .. rm set what customer c is waiting for (Request)
+  DETECT          run deadlock detection (Section 8.7.2)
   HELP            show this help
   QUIT            exit the program
 banker> rq 1 0 0 1
