@@ -29,7 +29,7 @@ Interactive UI нь Python стандарт сангийн жижиг серве
 ажиллуулж, хариуг нь **Resource graph** (assignment, claim, request ирмэгтэй
 процесс–нөөцийн граф) ба safety algorithm-ийн алхамчилсан харагдацаар үзүүлнэ.
 
-**Туршилт.** C unit тест (11 бүлэг, 62 шалгалт), CLI-ийн 25 тохиолдол (хүлээгдсэн
+**Туршилт.** C unit тест (15 бүлэг, 86 шалгалт), CLI-ийн 25 тохиолдол (хүлээгдсэн
 гаралттай харьцуулна), серверийн 8 integration тест бүгд амжилттай давсан.
 AddressSanitizer/UBSan-тай build дээр ч алдаа гараагүй.
 
@@ -341,7 +341,7 @@ Repository-г GitHub-аас шинээр clone хийж `make && make test` аж
 
 | Түвшин | Хэрэгсэл | Тоо |
 |---|---|---|
-| Unit (core функц) | `tests/unit_tests.c` | 11 бүлэг, 62 шалгалт |
+| Unit (core функц) | `tests/unit_tests.c` | 15 бүлэг, 86 шалгалт |
 | CLI (end-to-end) | `tests/run_cli_tests.sh`: `tests/cases/*.args/.in` → `tests/expected/*.out` | 25 тохиолдол |
 | UI сервер + JSON | `tests/test_ui_server.py` (unittest) | 8 тест |
 | UI (гар аргаар) | Headless Chromium-оор товч дарж screenshot авсан (энэ тайлангийн зургууд) | 15 зураг |
@@ -399,7 +399,7 @@ Request DENIED for T0: (0, 2, 0) - granting it would leave the system in an unsa
 
 ```
 make test
-62 checks, 0 failed          (unit)
+86 checks, 0 failed          (unit)
 23 passed, 0 failed          (CLI)
 Ran 8 tests ... OK           (server)
 ```
@@ -463,6 +463,12 @@ System is DEADLOCKED. Deadlocked threads: T1 T2 T3 T4
 | 25 | T1 нь A-г 8 хүлээнэ (системд 7) | Зөвхөн T1 deadlock | `DEADLOCKED: T1` (✔) |
 | 25 | `RESET`-ийн дараа | Request матриц цэвэр | `No deadlock` (✔) |
 
+Unit түвшинд `tests/unit_tests.c` дотор `bank_detect_deadlock()`-ийн дөрвөн тест
+нэмсэн: номын §8.7.2 жишээ (deadlock байхгүй, дараа нь T1..T4 deadlock), хоёр
+thread-ийн тойрог хүлээлт (нэг instance чөлөөлөгдвөл тасарна), юу ч эзэмшээгүй
+thread (deadlock биш, харин `bank_is_safe()` ижил өгөгдлийг unsafe гэдэг) болон
+trace callback. Unit шалгалтын тоо 62-оос 86 болсон.
+
 Хязгаарлалт: detection зөвхөн deadlock-ийг мэдээлнэ, сэргээхгүй (§8.8). UI-ийн
 Resource graph дээр deadlock-д орсон thread-ийг тодруулах дүрслэл хараахан
 нэмээгүй.
@@ -507,8 +513,8 @@ thread-уудыг индексийн дарааллаар давтан шалг�
 - Resource graph бүхий интерактив UI нь C программтай шууд холбогдож, өгөгдөл засварлах,
   хүсэлт оруулах, safety algorithm-ийг алхамчлах, татгалзсан хүсэлтийн шалтгааныг харуулах
   боломжтой.
-- Номын жишээнүүдийн үр дүнг бүрэн давтаж, 95 автомат тестээр зөв ажиллагааг нотолсон
-  (62 unit шалгалт, 25 CLI тохиолдол, 8 серверийн тест).
+- Номын жишээнүүдийн үр дүнг бүрэн давтаж, 119 автомат тестээр зөв ажиллагааг нотолсон
+  (86 unit шалгалт, 25 CLI тохиолдол, 8 серверийн тест).
 - Deadlock detection (§8.7.2) нэмж, номын жишээгээр (T1..T4 deadlock) батлав.
 - Номын жишээ оролт эхнээсээ unsafe байгааг илрүүлсэн.
 
@@ -540,6 +546,7 @@ Commit-ийн бүрэн түүхийг `git log --oneline` эсвэл GitHub-и
 | `cli: add WAIT and DETECT commands` | `main.c` |
 | `tests: update HELP expected output for WAIT and DETECT` | `tests/expected/07_command_errors.out` |
 | `tests: add deadlock detection cases (OSC 8.7.2 example and edge cases)` | `tests/cases/24_*`, `25_*`, `tests/data/detect_*` |
+| `tests: add unit tests for bank_detect_deadlock (OSC 8.7.2)` | `tests/unit_tests.c` |
 | `docs: ...` | Тайлан, Manual, README |
 
 ## Хавсралт A. Ажлын хуваарилалт

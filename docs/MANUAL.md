@@ -285,7 +285,7 @@ xcode-select --install
 [PASS] need = max - allocation
 [PASS] safety: textbook 8.6.3.3
 ...
-62 checks, 0 failed
+86 checks, 0 failed
 ./tests/run_cli_tests.sh
 [PASS] 01_book_example
 ...
