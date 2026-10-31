@@ -211,6 +211,126 @@ static void test_validate(void)
     CHECK(bank_validate(&b, err, sizeof(err)) == -1);
 }
 
+/*
+ * Snapshot of Section 8.7.2: A = 7, B = 2, C = 6, Available = (0, 0, 0).
+ * Detection does not use Maximum, so it is set to Allocation + Request.
+ */
+static void detect_example(bank_t *b, int request[][MAX_RESOURCES])
+{
+    static const int alloc[] = {0, 1, 0, 2, 0, 0, 3, 0, 3, 2, 1, 1, 0, 0, 2};
+    static const int req[] = {0, 0, 0, 2, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 2};
+
+    bank_init(b, 5, 3);
+    set_rows(b->allocation, alloc, 5, 3);
+    set_rows(request, req, 5, 3);
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 3; j++)
+            b->maximum[i][j] = alloc[i * 3 + j] + req[i * 3 + j];
+    bank_update_need(b);
+}
+
+static void test_detect_book(void)
+{
+    bank_t b;
+    int req[MAX_CUSTOMERS][MAX_RESOURCES] = {{0}};
+    int dead[MAX_CUSTOMERS];
+
+    detect_example(&b, req);
+    CHECK(bank_detect_deadlock(&b, req, dead, NULL, NULL) == 0);
+    for (int i = 0; i < 5; i++)
+        CHECK(dead[i] == 0);
+
+    /* T2 makes one more request for an instance of C: T1..T4 deadlock */
+    req[2][2] = 1;
+    CHECK(bank_detect_deadlock(&b, req, dead, NULL, NULL) == 4);
+    CHECK(dead[0] == 0);
+    CHECK(dead[1] == 1);
+    CHECK(dead[2] == 1);
+    CHECK(dead[3] == 1);
+    CHECK(dead[4] == 1);
+}
+
+static void test_detect_circular_wait(void)
+{
+    bank_t b;
+    int req[MAX_CUSTOMERS][MAX_RESOURCES] = {{0}};
+    int dead[MAX_CUSTOMERS];
+
+    /* T0 holds A and waits for B; T1 holds B and waits for A */
+    bank_init(&b, 2, 2);
+    b.allocation[0][0] = 1;
+    b.allocation[1][1] = 1;
+    req[0][1] = 1;
+    req[1][0] = 1;
+    b.maximum[0][0] = 1;
+    b.maximum[0][1] = 1;
+    b.maximum[1][0] = 1;
+    b.maximum[1][1] = 1;
+    bank_update_need(&b);
+
+    CHECK(bank_detect_deadlock(&b, req, dead, NULL, NULL) == 2);
+    CHECK(dead[0] == 1);
+    CHECK(dead[1] == 1);
+
+    /* one free instance of A breaks the cycle */
+    b.available[0] = 1;
+    CHECK(bank_detect_deadlock(&b, req, dead, NULL, NULL) == 0);
+    CHECK(dead[0] == 0);
+    CHECK(dead[1] == 0);
+}
+
+static void test_detect_holds_nothing(void)
+{
+    bank_t b;
+    int req[MAX_CUSTOMERS][MAX_RESOURCES] = {{0}};
+    int dead[MAX_CUSTOMERS];
+
+    /* T0 holds nothing and waits for 5 of a resource that has only 1
+     * instance. It blocks nobody, so it is not deadlocked. */
+    bank_init(&b, 2, 1);
+    b.allocation[1][0] = 1;
+    req[0][0] = 5;
+    b.maximum[0][0] = 5;
+    b.maximum[1][0] = 1;
+    bank_update_need(&b);
+
+    CHECK(bank_detect_deadlock(&b, req, dead, NULL, NULL) == 0);
+    CHECK(dead[0] == 0);
+    CHECK(dead[1] == 0);
+    /* the safety algorithm treats the same snapshot as unsafe
+     * (this is why detection is not just bank_is_safe, Exercise 8.10) */
+    CHECK(!bank_is_safe(&b, NULL, NULL, NULL, NULL));
+}
+
+static void count_detect_trace(const bank_t *b, int customer, int ok,
+                               const int request[], const int work[],
+                               void *ctx)
+{
+    (void)b;
+    (void)customer;
+    (void)ok;
+    (void)request;
+    (void)work;
+    (*(int *)ctx)++;
+}
+
+static void test_detect_trace(void)
+{
+    bank_t b;
+    int req[MAX_CUSTOMERS][MAX_RESOURCES] = {{0}};
+    int dead[MAX_CUSTOMERS];
+    int calls = 0;
+
+    detect_example(&b, req);
+    bank_detect_deadlock(&b, req, dead, count_detect_trace, &calls);
+    CHECK(calls == 6);
+
+    req[2][2] = 1;
+    calls = 0;
+    bank_detect_deadlock(&b, req, dead, count_detect_trace, &calls);
+    CHECK(calls == 9);
+}
+
 int main(void)
 {
     struct {
@@ -228,6 +348,10 @@ int main(void)
         {"parse vector", test_parse_vector},
         {"load matrix files", test_load_files},
         {"validate allocation <= max", test_validate},
+        {"detection: textbook 8.7.2", test_detect_book},
+        {"detection: circular wait", test_detect_circular_wait},
+        {"detection: thread holding nothing", test_detect_holds_nothing},
+        {"detection trace callback", test_detect_trace},
     };
     int count = (int)(sizeof(tests) / sizeof(tests[0]));
 
