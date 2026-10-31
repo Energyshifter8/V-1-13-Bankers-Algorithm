@@ -1,0 +1,15 @@
+# no WAIT yet: nobody is waiting, so no deadlock
+DETECT
+# invalid WAIT commands must be rejected with a clear message
+WAIT 9 1 0 0
+WAIT 1 1 0
+WAIT 1 -1 0 0
+WAIT 1 x 0 0
+WAIT
+# T1 waits for 8 of A but the system has only 7: it can never finish,
+# so T1 alone is deadlocked
+WAIT 1 8 0 0
+DETECT
+# RESET clears the Request matrix again
+RESET
+DETECT

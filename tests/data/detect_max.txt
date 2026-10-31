@@ -1,0 +1,7 @@
+# Section 8.7.2 snapshot. Detection does not use Max; the values only
+# have to be >= Allocation.
+7,2,6
+7,2,6
+7,2,6
+7,2,6
+7,2,6

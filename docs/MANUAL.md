@@ -85,6 +85,8 @@ make ui         # UI серверийг асаагаад браузер нээн
 | `MAX c r1 .. rm` | Харилцагч c-ийн Maximum-ийг өөрчилнө |
 | `ALLOC c r1 .. rm` | Харилцагч c-ийн Allocation-ийг өөрчилнө |
 | `SAVE` | Одоогийн төлөвийг RESET-ийн анхны төлөв болгоно |
+| `WAIT c r1 .. rm` | Харилцагч c-ийн хүлээж буй хүсэлтийг (Request матриц) тохируулна, `DETECT`-д хэрэглэнэ |
+| `DETECT` | Deadlock detection algorithm-ийг (§8.7.2) алхам бүрээр ажиллуулна |
 | `HELP`, `QUIT` | Тусламж, гарах |
 
 ### UI-ийн самбарууд
@@ -184,6 +186,26 @@ Available-ийг `10 6 7 8` болгоход (`examples/04_book_project_6B.txt`)
 | `cannot listen on 127.0.0.1:8000` | Порт ашиглагдаж байна | `python3 src/ui/server.py --port 8080` |
 | UI: Apply дарахад "C программ засварыг хүлээж аваагүй: allocation ... would exceed its maximum" | Allocation > Max | Max-ийг нэмэх эсвэл Allocation-ийг багасгана. Өмнөх төлөв рүү **Reset**-ээр буцна |
 
+## 1.11 Жишээ 4. Deadlock detection (§8.7.2)
+
+```
+./bin/banker -f tests/data/detect_max.txt -a tests/data/detect_alloc.txt 0 0 0
+banker> WAIT 1 2 0 2
+banker> WAIT 3 1 0 0
+banker> WAIT 4 0 0 2
+banker> DETECT
+...
+No deadlock: every thread can finish.
+banker> WAIT 2 0 0 1
+banker> DETECT
+...
+System is DEADLOCKED. Deadlocked threads: T1 T2 T3 T4
+```
+
+`WAIT` нь thread одоо ямар нөөц хүлээж байгааг заана (Request матриц). Эзэмшиж буй
+нөөц нь `-a` файлын Allocation. Юу ч эзэмшээгүй thread deadlock-д орохгүй. `RESET`
+ба `NEW` Request матрицыг цэвэрлэнэ. Detection нь зөвхөн мэдээлнэ, сэргээхгүй.
+
 # 2. Operational заавар
 
 ## 2.1 Repository clone хийх
@@ -249,6 +271,7 @@ xcode-select --install
 | Буруу файл | `tests/cases/13..20` | Файл байхгүй, буруу баганын тоо, тоо биш, сөрөг, хоосон, Allocation-ийн мөрийн тоо, Allocation > Max |
 | Буруу команд | `tests/cases/07_command_errors` | Дутуу/илүү утга, байхгүй харилцагч, сөрөг, Need-ээс их, Allocation-аас их release, тодорхойгүй команд, жижиг үсэг |
 | Засварлах команд | `tests/cases/08_edit_commands` | NEW, AVAIL, MAX, ALLOC, SAVE/RESET, хязгаар (n = 0, 33) |
+| Deadlock detection | `tests/cases/24_detect`, `25_detect_edge` | Номын §8.7.2 жишээ, буруу WAIT, хэтэрхий их хүсэлт, RESET |
 | JSON горим | `tests/cases/09, 23` | Мөр бүрт нэг JSON, unsafe үеийн trial төлөв |
 | Урт мөр | `tests/cases/22, 23` | 1022-оос урт мөр хоёр команд болж хуваагдахгүй |
 | Сервер | `tests/test_ui_server.py` | API, QUIT хориглох, мөр шилжүүлэх тэмдэгтээр команд нэмэх оролдлого, batch алдаан дээр зогсох, бүх сценари ачаалагдах |

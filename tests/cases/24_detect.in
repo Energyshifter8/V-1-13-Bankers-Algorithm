@@ -1,0 +1,9 @@
+# Section 8.7.2: Available = (0,0,0), T0 and T2 are not waiting
+WAIT 1 2 0 2
+WAIT 3 1 0 0
+WAIT 4 0 0 2
+# no deadlock: T0, T2, T3, T4, T1 can finish in this order
+DETECT
+# T2 makes one more request for C -> T1, T2, T3, T4 deadlocked
+WAIT 2 0 0 1
+DETECT
